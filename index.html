@@ -2,313 +2,66 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlphaSignals.ai | Professional Trading Intelligence Terminal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AlphaSignals.ai | Professional Quantum Terminal</title>
     <style>
-        :root {
-            --bg-color: #060913;
-            --container-bg: #0d1222;
-            --accent-color: #00e676; 
-            --text-main: #ffffff;
-            --text-muted: #64748b;
-            --border-color: #1e293b;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 20px;
-        }
-        .header-section {
-            text-align: center;
-            max-width: 700px;
-            margin: 0 auto 30px auto;
-            background: var(--container-bg);
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-        .badge {
-            background: rgba(0, 230, 118, 0.1);
-            color: var(--accent-color);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 12px;
-        }
-        h1 { font-size: 1.8rem; margin-bottom: 10px; }
-        h1 span { color: var(--accent-color); }
-        p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 15px; }
-        form.waitlist-form {
-            background: #060913;
-            padding: 6px;
-            border-radius: 30px;
-            border: 1px solid var(--border-color);
-            display: flex;
+        html, body {
+            margin: 0;
+            padding: 0;
             width: 100%;
-        }
-        input[type="email"] {
-            flex: 2;
-            background: transparent;
-            border: none;
-            padding: 10px 15px;
-            color: white;
-            font-size: 0.9rem;
-            outline: none;
-        }
-        button {
-            background: var(--accent-color);
-            color: #060913;
-            border: none;
-            padding: 10px 20px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            border-radius: 25px;
-            cursor: pointer;
-        }
-        .terminal-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: var(--container-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-        }
-        /* محرك القائمة المنسدلة الخارجي الذكي الفخم */
-        .dropdown-container {
-            position: relative;
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        .custom-select-trigger {
-            background: #060913;
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .custom-options {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: #0d1222;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-top: 5px;
-            max-height: 250px;
-            overflow-y: auto;
-            z-index: 999;
-            display: none;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-        .custom-option {
-            padding: 12px 15px;
-            cursor: pointer;
-            font-weight: 600;
-            border-bottom: 1px solid rgba(30, 41, 59, 0.3);
-            transition: background 0.2s ease;
-        }
-        .custom-option:hover {
-            background: #1e293b;
-            color: var(--accent-color);
-        }
-        /* إجبار الشارت على أخذ مساحة طولية ثابتة ضخمة تمنع انضغاط الشموع نهائياً */
-        .widget-wrapper {
-            width: 100%;
-            height: 550px; 
-            border-radius: 8px;
+            height: 100%;
+            background-color: #060913;
             overflow: hidden;
-            margin-top: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .signals-box {
-            background: #060913;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 5px;
-            text-align: left;
-        }
-        .signals-title {
-            color: var(--accent-color);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-        .green-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent-color);
-            border-radius: 50%;
-            animation: blink 1.2s infinite;
-        }
-        .signals-table {
+        /* تصميم الحاوية لتأخذ الشاشة كاملة 100% وتمنع انضغاط الشارت نهائياً */
+        .terminal-fullscreen {
             width: 100%;
-            border-collapse: collapse;
-            color: white;
-            font-size: 0.95rem;
-        }
-        .signals-table th {
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-muted);
-            padding: 10px 5px;
-            text-align: left;
-        }
-        .signals-table td {
-            padding: 15px 5px;
-            font-weight: 600;
-        }
-        .signal-type-long { color: #00e676; font-weight: bold; }
-        .signal-type-short { color: #ff3d00; font-weight: bold; }
-        
-        @keyframes blink {
-            0% { opacity: 0.2; }
-            50% { opacity: 1; }
-            100% { opacity: 0.2; }
-        }
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .header-section { padding: 15px; }
-            h1 { font-size: 1.4rem; }
-            form.waitlist-form { flex-direction: column; border-radius: 12px; padding: 10px; gap: 10px; }
-            form.waitlist-form input[type="email"] { background: #060913; border-radius: 8px; padding: 12px; }
-            form.waitlist-form button { border-radius: 8px; padding: 12px; }
-            .widget-wrapper { height: 480px; }
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
         }
     </style>
 </head>
 <body>
 
-    <div class="header-section">
-        <div class="badge">PRO QUANT TERMINAL v7.0</div>
-        <h1>AlphaSignals <span>Intelligence</span> Hub</h1>
-        <p>Real-time machine-learning technical analysis, automated target hunting, and predictive indicators.</p>
-        
-        <form class="waitlist-form" action="https://formspree.io/f/xpqewykp" method="POST">
-            <input type="email" name="email" placeholder="Enter your business email for premium signals..." required>
-            <button type="submit">Unlock Full Engine</button>
-        </form>
+    <div class="terminal-fullscreen">
+        <div id="alphasignals_advanced_terminal" style="width: 100%; height: 100%;"></div>
     </div>
 
-    <div class="terminal-container">
-        
-        <div class="dropdown-container">
-            <div class="custom-select-trigger" id="select-trigger" onclick="toggleDropdown()">
-                <span>📊 Select Crypto Asset to Analyze...</span>
-                <span>▼</span>
-            </div>
-            <div class="custom-options" id="dropdown-options">
-                <div class="custom-option" onclick="selectPair('BINANCE:BTCUSDT', 'BTC / USDT', 'LONG ENTRY', '$63,120', '$64,750', '$62,100')">🪙 BTC (Bitcoin)</div>
-                <div class="custom-option" onclick="selectPair('BINANCE:WLDUSDT', 'WLD / USDT', 'SHORT ENTRY', '$0.5510', '$0.5180', '$0.5790')">🧬 WLD (Worldcoin)</div>
-                <div class="custom-option" onclick="selectPair('BYBIT:HYPEUSDT', 'HYPE / USDT', 'SHORT ENTRY', '$62.50', '$58.20', '$65.90')">🔥 HYPE (Hyperliquid)</div>
-                <div class="custom-option" onclick="selectPair('BINANCE:SOLUSDT', 'SOL / USDT', 'LONG ENTRY', '$165.40', '$174.00', '$159.20')">☀️ SOL (Solana)</div>
-                <div class="custom-option" onclick="selectPair('BINANCE:ETHUSDT', 'ETH / USDT', 'LONG ENTRY', '$3,450', '$3,620', '$3,310')">💎 ETH (Ethereum)</div>
-            </div>
-        </div>
-
-        <div class="signals-box">
-            <div class="signals-title">
-                <div class="green-dot"></div>
-                <span>AlphaSignals AI - Live Terminal Intelligence Briefing</span>
-            </div>
-            <table class="signals-table">
-                <thead>
-                    <tr>
-                        <th>Selected Ticker</th>
-                        <th>AI Recommendation</th>
-                        <th>Mathematical Entry</th>
-                        <th>Take Profit (TP)</th>
-                        <th>Stop Loss (SL)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td id="live-pair">BTC / USDT</td>
-                        <td id="live-bias" class="signal-type-long">LONG ENTRY</td>
-                        <td id="live-entry">$63,120</td>
-                        <td id="live-tp" style="color: #00e676;">$64,750</td>
-                        <td id="live-sl" style="color: #ff3d00;">$62,100</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="widget-wrapper">
-            <div id="tradingview_widget" style="width: 100%; height: 100%;"></div>
-        </div>
-
-    </div>
+    <form id="hidden-waitlist" action="https://formspree.io/f/xpqewykp" method="POST" style="display: none;">
+        <input type="email" name="email" id="hidden-email">
+    </form>
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="text/javascript">
-        // دالة البناء الأساسية المستقرة والمحمية للأبعاد والثبات
-        function initChart(symbolName) {
-            document.getElementById("tradingview_widget").innerHTML = ""; 
-            new TradingView.widget({
-                "width": "100%",
-                "height": "100%",
-                "symbol": symbolName,
-                "interval": "15",
-                "timezone": "Etc/UTC",
-                "theme": "dark",
-                "style": "1",
-                "locale": "en",
-                "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false,
-                "hide_side_toolbar": true,
-                "allow_symbol_change": false, // إلغاء محرك التداخل لمنع التضارب البرمجي وانكماش الشاشة
-                "container_id": "tradingview_widget"
-            });
-        }
-
-        // تشغيل أولي للبيتكوين
-        initChart("BINANCE:BTCUSDT");
-
-        // دالة فتح وإغلاق القائمة الفخمة بدون لوحة مفاتيح
-        function toggleDropdown() {
-            var options = document.getElementById("dropdown-options");
-            options.style.display = (options.style.display === "block") ? "none" : "block";
-        }
-
-        // هندسة التحديث المتزامن الفوري والمضمون 100%
-        function selectPair(tvSymbol, dispName, recommendation, entry, tp, sl) {
-            initChart(tvSymbol); // تحديث الشارت فوراً بالحجم المستقر
+        new TradingView.widget({
+            "autosize": true, // الشارت يتمدد تلقائياً ليملأ الشاشة بالكامل ويمنع أي ضغط
+            "symbol": "BINANCE:BTCUSDT", // العملة الافتراضية عند الفتح
+            "interval": "15", // الفاصل الزمني الافتراضي 15 دقيقة للسكالبينج
+            "timezone": "Etc/UTC",
+            "theme": "dark", // الثيم الليلي الفخم
+            "style": "1", // شموع يابانية احترافية
+            "locale": "en",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "withdaterange": true,
+            "hide_side_toolbar": false, // إظهار شريط الأدوات الجانبي الكامل للرسم والتحليل
+            "allow_symbol_change": true, // تفعيل محرك البحث العالمي الحقيقي عن آلاف العملات
+            "details": true, // إظهار بيانات أسعار العملة المختارة بدقة مليمترية لايف بالجانب
+            "hotlist": true, // إظهار قائمة العملات الأكثر صعوداً وهبوطاً بلحظتها
+            "calendar": true,
+            "container_id": "alphasignals_advanced_terminal",
             
-            // تحديث الجدول بالكامل بلحظتها
-            document.getElementById("live-pair").innerText = dispName;
-            document.getElementById("live-bias").innerText = recommendation;
-            document.getElementById("live-entry").innerText = entry;
-            document.getElementById("live-tp").innerText = tp;
-            document.getElementById("live-sl").innerText = sl;
-            
-            if (recommendation.includes("LONG")) {
-                document.getElementById("live-bias").className = "signal-type-long";
-            } else {
-                document.getElementById("live-bias").className = "signal-type-short";
-            }
-            
-            toggleDropdown(); // إغلاق القائمة
-            document.getElementById("select-trigger").querySelector("span").innerText = "📊 Active: " + dispName;
-        }
-
-        // إغلاق القائمة في حال الضغط في أي مكان خارجها
-        window.onclick = function(event) {
-            if (!event.target.matches('.custom-select-trigger') && !event.target.matches('.custom-select-trigger span')) {
-                document.getElementById("dropdown-options").style.style.display = "none";
-            }
-        }
+            // دمج مؤشرات الزخم والدخول والخروج الرياضية (RSI + MACD) تلقائياً داخل الشارت لأي عملة يبحث عنها المستخدم!
+            "studies": [
+                "RSI@tv-basicstudies",
+                "MACD@tv-basicstudies"
+            ]
+        });
     </script>
 
 </body>
