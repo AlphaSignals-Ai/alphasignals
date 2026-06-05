@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlphaSignals.ai | Pro Exchange Terminal</title>
+    <title>AlphaSignals.ai | Ultimate Exchange Terminal</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
@@ -19,83 +19,75 @@
     </nav>
 
     <div class="ticker-bar">
-        <div class="ticker-track" id="live-ticker-track">Fetching Live Markets Data...</div>
+        <div class="ticker-track" id="live-ticker-track">Connecting to Live Exchange Feeds...</div>
     </div>
 
     <section class="hero" id="home-section">
-        <div class="badge">PRO QUANT EXCHANGE TERMINAL</div>
-        <h1>Institutional Crypto Intelligence</h1>
-        <p>Advanced market analytics, Live API integration and automated predictive workflows.</p>
-
         <div class="search-trigger-container" id="terminal-section">
             <button class="search-trigger-btn" onclick="openSearchModal()">
-                <div style="display:flex; align-items:center; gap:10px;">
+                <div class="search-btn-left">
                     <span class="search-icon">🔍</span>
-                    <span id="current-search-display" style="color:#fff; font-weight:bold; font-size:1.1rem;">BTC / USDT</span>
+                    <span id="current-search-display">BTC / USDT</span>
                 </div>
-                <span class="shortcut-key">Select Market</span>
+                <div class="search-btn-right">
+                    <span class="pulse-dot" id="live-dot" style="display:none;"></span>
+                    <span class="shortcut-key">Select Market</span>
+                </div>
             </button>
         </div>
 
         <div class="chart-wrapper">
             <div id="tv-home-chart" class="chart"></div>
             
-            <div class="chart-overlay-signals" id="chart-overlay" style="display: none;">
-                <div class="overlay-header">
-                    <span class="pulse-dot"></span> <span id="overlay-title">AI TARGETS</span>
-                </div>
-                <div class="overlay-body">
-                    <div class="overlay-row"><span class="lbl">ENTRY</span> <span class="val text-blue" id="ov-entry">-</span></div>
-                    <div class="overlay-row"><span class="lbl">TARGET</span> <span class="val text-green" id="ov-tp">-</span></div>
-                    <div class="overlay-row"><span class="lbl">STOP</span> <span class="val text-red" id="ov-sl">-</span></div>
-                </div>
+            <div id="ai-scanner" class="scanner-line" style="display:none;"></div>
+            <div id="ai-scanning-text" class="scanning-text" style="display:none;">AI Scanning Orderbook...</div>
+
+            <div id="prediction-path" class="prediction-box" style="display:none;">
+                <svg viewBox="0 0 100 100" class="pred-svg">
+                    <path id="svg-proj-line" d="M0,50 Q50,50 100,10" fill="none" stroke="#00e676" stroke-width="3" stroke-dasharray="8,8" class="moving-path"/>
+                </svg>
             </div>
         </div>
 
-        <div class="pro-order-panel" id="ai-signals" style="display: none;">
-            <div class="panel-header">
-                <div class="trade-bias" id="ai-bias-badge">LONG POSITION</div>
-                <div class="trade-settings">
-                    <span class="setting-tag">Cross 50x</span>
-                    <span class="setting-tag">Risk: 1%</span>
-                    <span class="setting-tag text-green" id="ai-rr">R:R 1:3.2</span>
-                </div>
-            </div>
+        <div class="sleek-order-bar" id="sleek-order-bar" style="display:none;">
+            <div class="slim-bias-badge" id="slim-bias">LONG</div>
             
-            <div class="order-inputs-grid">
-                <div class="order-input-box">
-                    <label>Limit Entry Price</label>
-                    <div class="input-display" id="ai-entry">$0.00</div>
+            <div class="slim-details-group">
+                <div class="slim-detail">
+                    <span>Entry Target</span>
+                    <strong id="slim-entry">$0.00</strong>
                 </div>
-                <div class="order-input-box target-box">
-                    <label>Take Profit (TP)</label>
-                    <div class="input-display text-green" id="ai-tp">$0.00</div>
+                <div class="slim-separator"></div>
+                <div class="slim-detail">
+                    <span>Take Profit</span>
+                    <strong id="slim-tp" class="text-green">$0.00</strong>
                 </div>
-                <div class="order-input-box stop-box">
-                    <label>Stop Loss (SL)</label>
-                    <div class="input-display text-red" id="ai-sl">$0.00</div>
+                <div class="slim-separator"></div>
+                <div class="slim-detail">
+                    <span>Stop Loss</span>
+                    <strong id="slim-sl" class="text-red">$0.00</strong>
                 </div>
             </div>
 
-            <button class="execute-btn" id="ai-execute-btn">Execute Auto-Trade via API</button>
+            <button class="slim-execute-btn" id="slim-exec-btn">Execute Trade</button>
         </div>
     </section>
 
     <div id="search-modal" class="modal-overlay" onclick="closeSearchModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <input type="text" id="modal-search-input" placeholder="Search 150+ live markets..." onkeyup="renderTokens()">
+                <input type="text" id="modal-search-input" placeholder="Search 300+ live markets..." onkeyup="renderTokens()">
                 <button class="close-btn" onclick="closeSearchModal(event)">✕</button>
             </div>
             
-            <div class="modal-tabs">
-                <button class="tab-btn active" onclick="setTab('all', this)">All Markets</button>
-                <button class="tab-btn" onclick="setTab('perps', this)">Perpetuals</button>
-                <button class="tab-btn" onclick="setTab('spot', this)">Spot</button>
+            <div class="modal-list-header">
+                <div style="flex: 2;">Market</div>
+                <div style="flex: 1; text-align: right;">Price</div>
+                <div style="flex: 1; text-align: right;">24h Change</div>
             </div>
 
             <div class="modal-list" id="modal-token-list">
-                <div class="loader-text">Fetching Live Binance Data...</div>
+                <div class="loader-text">Fetching Live Markets Data...</div>
             </div>
         </div>
     </div>
