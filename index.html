@@ -3,127 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlphaSignals.ai | DEX Terminal</title>
+    <title>AlphaSignals.ai | Pro Analysis Terminal</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
-    <!-- الشريط العلوي النحيف والنظيف -->
     <nav class="navbar">
-        <div class="logo">AlphaSignals</div>
+        <div class="logo">AlphaSignals<span>.ai</span></div>
         <div class="nav-links">
-            <a href="#" class="active">Trade</a>
-            <a href="#">Portfolio</a>
-            <a href="#">Vaults</a>
-            <a href="#">More</a>
+            <a href="#">Home</a>
+            <a href="#terminal-section">Terminal</a>
+            <a href="#ai-signals">Signals</a>
+            <a href="#">Pricing</a>
         </div>
     </nav>
 
-    <!-- الواجهة الرئيسية المقسمة (DEX Layout) -->
-    <div class="terminal-layout">
-        
-        <!-- القسم الأيسر: الشارت والبحث -->
-        <div class="main-pane">
-            <!-- شريط البحث العلوي (مثل Hyperliquid) -->
-            <div class="market-header" onclick="openSearchModal()">
-                <div class="market-info">
-                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" id="market-icon" class="market-icon" alt="icon" onerror="this.style.display='none'">
-                    <h1 id="market-title">BTC-USDT</h1>
-                    <span class="leverage-badge" id="market-leverage">40x</span>
-                </div>
-                <div class="market-stats">
-                    <div class="stat-box">
-                        <span class="stat-label">Price</span>
-                        <span class="stat-value" id="market-price">Loading...</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label">24h Change</span>
-                        <span class="stat-value" id="market-change">--</span>
-                    </div>
-                    <div class="search-icon-btn">🔍 Search</div>
-                </div>
-            </div>
-
-            <!-- حاضنة الشارت النظيفة -->
-            <div class="chart-container">
-                <div id="tv-chart" class="tv-widget"></div>
-                
-                <!-- الأهداف المدمجة بداخل الشارت (الخدعة الاحترافية والنظيفة) -->
-                <div class="in-chart-ai-overlay" id="in-chart-ai">
-                    <span class="ai-badge">AI TARGETS</span>
-                    <span>Entry: <b id="chart-entry">--</b></span> | 
-                    <span class="text-green">TP: <b id="chart-tp">--</b></span> | 
-                    <span class="text-red">SL: <b id="chart-sl">--</b></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- القسم الأيمن: لوحة أوامر التداول المريحة (Order Panel) -->
-        <div class="order-pane">
-            <div class="order-tabs">
-                <button class="order-tab active long" onclick="setBias('long')">Long</button>
-                <button class="order-tab short" onclick="setBias('short')">Short</button>
-            </div>
-
-            <div class="order-type-tabs">
-                <span class="active">Limit</span>
-                <span>Market</span>
-                <span>Stop</span>
-            </div>
-
-            <div class="order-form">
-                <div class="input-group">
-                    <label>Price (USDT)</label>
-                    <input type="text" id="order-price" value="0.00" readonly>
-                </div>
-                <div class="input-group">
-                    <label>Size</label>
-                    <input type="text" placeholder="0.00">
-                </div>
-
-                <div class="tpsl-section">
-                    <div class="tpsl-header">
-                        <span>Take Profit / Stop Loss</span>
-                        <input type="checkbox" checked disabled>
-                    </div>
-                    <div class="input-group">
-                        <label class="text-green">Take Profit</label>
-                        <input type="text" id="order-tp" class="text-green" value="0.00" readonly>
-                    </div>
-                    <div class="input-group">
-                        <label class="text-red">Stop Loss</label>
-                        <input type="text" id="order-sl" class="text-red" value="0.00" readonly>
-                    </div>
-                </div>
-
-                <button class="place-order-btn" id="place-order-btn">Place Limit Order</button>
-            </div>
-        </div>
+    <div class="ticker-bar">
+        <div class="ticker-track" id="live-ticker-track">Loading Live Market Data...</div>
     </div>
 
-    <!-- نافذة البحث العالمية (Hyperliquid Clone تماماً كالصورة 45) -->
+    <section class="hero" id="home-section">
+        <div class="badge">PRO QUANT TERMINAL</div>
+        <h1>Professional Crypto Intelligence Platform</h1>
+        <p>Advanced market analytics, TradingView integration and AI-powered signal workflows.</p>
+
+        <div class="stats">
+            <div class="card"><h2>92.7%</h2><span>Accuracy</span></div>
+            <div class="card"><h2>1.2M+</h2><span>Signals</span></div>
+            <div class="card"><h2>300+</h2><span>Assets</span></div>
+        </div>
+
+        <div class="search-trigger-container" id="terminal-section">
+            <button class="search-trigger-btn" onclick="openSearchModal()">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span class="search-icon">🔍</span>
+                    <span id="current-search-display" style="color:#fff; font-weight:bold; font-size:1.1rem;">Search Markets...</span>
+                </div>
+                <span class="shortcut-key">/</span>
+            </button>
+        </div>
+
+        <div id="tv-home-chart" class="chart"></div>
+
+        <div class="ai-signals-container" id="ai-signals" style="display: none;">
+            <div class="ai-header">
+                <div class="pulse-dot"></div>
+                <span id="ai-title">AlphaSignals AI: Analyzing...</span>
+            </div>
+            <div class="ai-grid">
+                <div class="ai-card">
+                    <div class="ai-label">Market Bias</div>
+                    <div class="ai-value" id="ai-bias">-</div>
+                </div>
+                <div class="ai-card">
+                    <div class="ai-label">Mathematical Entry</div>
+                    <div class="ai-value" id="ai-entry">-</div>
+                </div>
+                <div class="ai-card">
+                    <div class="ai-label">Take Profit (TP)</div>
+                    <div class="ai-value ai-green" id="ai-tp">-</div>
+                </div>
+                <div class="ai-card">
+                    <div class="ai-label">Stop Loss (SL)</div>
+                    <div class="ai-value ai-red" id="ai-sl">-</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <div id="search-modal" class="modal-overlay" onclick="closeSearchModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-search-bar">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="modal-search-input" placeholder="Search markets..." onkeyup="renderTokens()">
+            <div class="modal-header">
+                <input type="text" id="modal-search-input" placeholder="Search 300+ markets..." onkeyup="renderTokens()">
                 <button class="close-btn" onclick="closeSearchModal(event)">✕</button>
             </div>
-            
             <div class="modal-tabs">
                 <button class="tab-btn active" onclick="setTab('all', this)">All</button>
                 <button class="tab-btn" onclick="setTab('perps', this)">Perps</button>
                 <button class="tab-btn" onclick="setTab('spot', this)">Spot</button>
             </div>
-
             <div class="modal-list-header">
-                <div style="flex: 2;">Symbol</div>
-                <div style="flex: 1; text-align: right;">Volume</div>
-                <div style="flex: 1; text-align: right;">Last Price<br><span style="font-size:0.7rem; font-weight:normal;">24h Change</span></div>
+                <div style="flex: 2;">Market</div>
+                <div style="flex: 1; text-align: right;">Price</div>
+                <div style="flex: 1; text-align: right;">24h Change</div>
             </div>
-
             <div class="modal-list" id="modal-token-list">
-                <div class="loader-text">Loading Live Markets...</div>
+                <div class="loader-text">Connecting to Binance API...</div>
             </div>
         </div>
     </div>
