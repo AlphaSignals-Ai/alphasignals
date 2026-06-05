@@ -106,8 +106,15 @@
             50% { opacity: 1; }
             100% { opacity: 0.2; }
         }
+        /* تعديل الأبعاد الذكي للهواتف المحمولة لمنع الضغط والتشويه */
         @media (max-width: 768px) {
-            #tradingview_widget { height: 400px; }
+            body { padding: 10px; }
+            .header-section { padding: 15px; }
+            h1 { font-size: 1.5rem; }
+            form { flex-direction: column; border-radius: 12px; padding: 10px; gap: 10px; }
+            input[type="email"] { background: #0d1222; border-radius: 8px; padding: 12px; }
+            button { border-radius: 8px; padding: 12px; }
+            #tradingview_widget { height: 350px; }
         }
     </style>
 </head>
@@ -119,7 +126,7 @@
         <p>Real-time machine-learning technical analysis, automated target hunting, and predictive indicators.</p>
         
         <!-- نظام التقاط الإيميلات الجاهز -->
-        <form action="https://formspree.io/f/xpqewykp" method="POST">
+        <form action="YOUR_FORMSPREE_URL_HERE" method="POST">
             <input type="email" name="email" placeholder="Enter your business email for premium signals..." required>
             <button type="submit">Unlock Full Engine</button>
         </form>
