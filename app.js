@@ -1,28 +1,54 @@
-// قاعدة بيانات العملات الاحترافية (بها الصور وتصنيفات الفيوتشر/سبوت)
-const tokens = [
-    { symbol: "BTCUSDT", name: "Bitcoin", price: 63120, type: "perps", icon: "https://cryptologos.cc/logos/bitcoin-btc-logo.png", exchange: "BINANCE" },
-    { symbol: "ETHUSDT", name: "Ethereum", price: 3450, type: "perps", icon: "https://cryptologos.cc/logos/ethereum-eth-logo.png", exchange: "BINANCE" },
-    { symbol: "SOLUSDT", name: "Solana", price: 165, type: "spot", icon: "https://cryptologos.cc/logos/solana-sol-logo.png", exchange: "BINANCE" },
-    { symbol: "WLDUSDT", name: "Worldcoin", price: 0.4920, type: "perps", icon: "https://cryptologos.cc/logos/worldcoin-wld-logo.png", exchange: "BINANCE" },
-    { symbol: "HYPEUSDT", name: "Hyperliquid", price: 62.50, type: "perps", icon: "https://cryptologos.cc/logos/hyperliquid-hype-logo.png", exchange: "BYBIT" }, // BYBIT كمثال
-    { symbol: "DOGEUSDT", name: "Dogecoin", price: 0.12, type: "spot", icon: "https://cryptologos.cc/logos/dogecoin-doge-logo.png", exchange: "BINANCE" },
-    { symbol: "AAPL", name: "Apple Inc.", price: 185.50, type: "stocks", icon: "🍏", exchange: "NASDAQ" } // كمثال للأسهم
-];
-
+let tokens = [];
 let currentTab = 'all';
 
-// التحكم في الروابط العلوية (Nav Links)
-function handleNav(section) {
-    if(section === 'home') {
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    } else if(section === 'terminal') {
-        document.getElementById('terminal-section').scrollIntoView({behavior: 'smooth', block: 'start'});
-    } else {
-        alert("🔒 This module requires Pro Access. Coming soon.");
+// جلب بيانات السوق الحية من Binance API
+async function fetchBinanceMarkets() {
+    try {
+        const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+        const data = await response.json();
+        
+        // تصفية أزواج USDT وترتيبها حسب حجم التداول (Volume) لأقوى 150 عملة
+        const usdtPairs = data.filter(d => d.symbol.endsWith('USDT'))
+                              .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
+                              .slice(0, 150);
+
+        tokens = usdtPairs.map(d => ({
+            symbol: d.symbol,
+            name: d.symbol.replace('USDT', ''),
+            price: parseFloat(d.lastPrice),
+            volume: parseFloat(d.quoteVolume),
+            type: parseFloat(d.quoteVolume) > 50000000 ? 'perps' : 'spot', // تصنيف وهمي للفيوتشر حسب السيولة
+            exchange: "BINANCE"
+        }));
+
+        // إضافة HYPE يدوياً لأنها في Bybit/Hyperliquid
+        tokens.unshift({ symbol: "HYPEUSDT", name: "HYPE", price: 62.50, volume: 99999999, type: "perps", exchange: "BYBIT" });
+
+        updateTickerBar();
+        renderTokens();
+        
+        // تحميل أول عملة تلقائياً
+        if(tokens.length > 0) selectToken(tokens[0]);
+
+    } catch (error) {
+        console.error("API Fetch Error:", error);
+        document.getElementById('modal-token-list').innerHTML = '<div class="loader-text text-red">Failed to load API. Please refresh.</div>';
     }
 }
 
-// فتح وإغلاق نافذة البحث الفاخرة
+// تحديث شريط الأسعار المتحرك بالأعلى
+function updateTickerBar() {
+    const top10 = tokens.slice(0, 15);
+    const tickerText = top10.map(t => `${t.name} $${t.price.toFixed(t.price < 1 ? 4 : 2)}`).join('  •  ');
+    document.getElementById('live-ticker-track').innerText = tickerText;
+}
+
+function handleNav(section) {
+    if(section === 'home') window.scrollTo({top: 0, behavior: 'smooth'});
+    else if(section === 'terminal') document.getElementById('terminal-section').scrollIntoView({behavior: 'smooth', block: 'start'});
+    else alert("🔒 This module requires Pro Access.");
+}
+
 function openSearchModal() {
     document.getElementById('search-modal').style.display = 'flex';
     document.getElementById('modal-search-input').focus();
@@ -34,62 +60,53 @@ function closeSearchModal(event) {
     document.getElementById('search-modal').style.display = 'none';
 }
 
-// تغيير خانات التبويب في البحث (All, Perps, Spot...)
 function setTab(tabName, btnElement) {
     currentTab = tabName;
     const tabs = document.getElementsByClassName('tab-btn');
-    for(let i=0; i<tabs.length; i++) {
-        tabs[i].classList.remove('active');
-    }
+    for(let i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
     btnElement.classList.add('active');
     renderTokens();
 }
 
-// رسم قائمة العملات في النافذة مع الفلترة
+// رسم قائمة العملات المستدعاة من الـ API
 function renderTokens() {
     const input = document.getElementById('modal-search-input').value.toUpperCase();
     const listContainer = document.getElementById('modal-token-list');
     listContainer.innerHTML = '';
 
+    if (tokens.length === 0) {
+        listContainer.innerHTML = '<div class="loader-text">Loading APIs...</div>';
+        return;
+    }
+
     const filtered = tokens.filter(t => {
-        const matchesSearch = t.symbol.includes(input) || t.name.toUpperCase().includes(input);
+        const matchesSearch = t.symbol.includes(input);
         const matchesTab = currentTab === 'all' || t.type === currentTab;
         return matchesSearch && matchesTab;
     });
-
-    if(filtered.length === 0) {
-        listContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #8b9bb4;">No markets found</div>';
-        return;
-    }
 
     filtered.forEach(t => {
         const div = document.createElement('div');
         div.className = 'token-item';
         div.onclick = () => selectToken(t);
-
-        // إذا كانت الأيقونة رابط صورة نضعها، وإذا كانت نص (إيموجي) نضعه مباشرة
-        const iconHtml = t.icon.startsWith('http') 
-            ? `<img src="${t.icon}" class="token-icon" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' fill=\\'none\\' viewBox=\\'0 0 24 24\\' stroke=\\'white\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z\\'/></svg>'">` 
-            : `<div class="token-icon" style="background:transparent; font-size:1.5rem;">${t.icon}</div>`;
+        
+        const priceFmt = t.price < 1 ? t.price.toFixed(4) : t.price.toFixed(2);
+        const volFmt = (t.volume / 1000000).toFixed(1) + 'M';
 
         div.innerHTML = `
-            <div class="token-left">
-                ${iconHtml}
-                <div class="token-info">
-                    <span class="token-symbol">
-                        ${t.symbol.replace("USDT", "")} 
-                        <span class="token-type-badge">${t.type}</span>
-                    </span>
-                    <span class="token-name">${t.name}</span>
-                </div>
+            <div>
+                <div class="token-symbol">${t.name} <span style="font-size:0.6rem; background:#2A2E39; padding:2px 4px; border-radius:4px;">${t.type.toUpperCase()}</span></div>
+                <div class="token-name">${t.exchange}</div>
             </div>
-            <div class="token-price">$${t.price}</div>
+            <div>
+                <div class="token-price">$${priceFmt}</div>
+                <div class="token-vol">Vol: $${volFmt}</div>
+            </div>
         `;
         listContainer.appendChild(div);
     });
 }
 
-// دالة تحديث الشارت
 function loadChart(symbolConfig) {
     document.getElementById('tv-home-chart').innerHTML = '';
     new TradingView.widget({
@@ -104,52 +121,64 @@ function loadChart(symbolConfig) {
         toolbar_bg: '#131a2d',
         enable_publishing: false,
         hide_side_toolbar: false,
-        allow_symbol_change: false, // نمنع البحث الداخلي لنجبره على استخدام النافذة الاحترافية الخاصة بنا
+        allow_symbol_change: false,
         studies: ["RSI@tv-basicstudies"]
     });
 }
 
-// دالة الذكاء الاصطناعي لحساب الأهداف
+// توليد التوصيات وتحديث اللوحة الطافية وصندوق التداول
 function generateAI(token) {
-    const aiBox = document.getElementById('ai-signals');
-    aiBox.style.display = 'block';
+    document.getElementById('ai-signals').style.display = 'block';
+    document.getElementById('chart-overlay').style.display = 'block'; // إظهار اللوحة الطافية
     
-    document.getElementById('ai-title').innerText = `AlphaSignals AI: Analyzing ${token.name} (${token.symbol.replace("USDT", "")})...`;
-    
-    const isLong = Math.random() > 0.4;
-    const bias = isLong ? "LONG ENTRY" : "SHORT ENTRY";
+    const isLong = Math.random() > 0.45;
     const entry = token.price;
-    const tp = isLong ? entry * 1.03 : entry * 0.97;
-    const sl = isLong ? entry * 0.985 : entry * 1.015;
-
+    const tp = isLong ? entry * 1.04 : entry * 0.96;
+    const sl = isLong ? entry * 0.98 : entry * 1.02;
     const precision = entry < 1 ? 4 : 2;
 
-    const biasEl = document.getElementById('ai-bias');
-    biasEl.innerText = bias;
-    biasEl.className = `ai-value ${isLong ? 'ai-green' : 'ai-red'}`;
+    const entryStr = `$${entry.toFixed(precision)}`;
+    const tpStr = `$${tp.toFixed(precision)}`;
+    const slStr = `$${sl.toFixed(precision)}`;
+
+    // 1. تحديث صندوق التداول الاحترافي السفلي
+    const biasBadge = document.getElementById('ai-bias-badge');
+    const execBtn = document.getElementById('ai-execute-btn');
     
-    document.getElementById('ai-entry').innerText = `$${entry.toFixed(precision)}`;
-    document.getElementById('ai-tp').innerText = `$${tp.toFixed(precision)}`;
-    document.getElementById('ai-sl').innerText = `$${sl.toFixed(precision)}`;
+    if (isLong) {
+        biasBadge.innerText = "LONG POSITION";
+        biasBadge.className = "trade-bias long";
+        execBtn.innerText = "Execute LONG via API";
+        execBtn.className = "execute-btn";
+        document.getElementById('ai-rr').innerText = "R:R 1:2.8";
+    } else {
+        biasBadge.innerText = "SHORT POSITION";
+        biasBadge.className = "trade-bias short";
+        execBtn.innerText = "Execute SHORT via API";
+        execBtn.className = "execute-btn short";
+        document.getElementById('ai-rr').innerText = "R:R 1:3.1";
+    }
+
+    document.getElementById('ai-entry').innerText = entryStr;
+    document.getElementById('ai-tp').innerText = tpStr;
+    document.getElementById('ai-sl').innerText = slStr;
+
+    // 2. تحديث اللوحة الطافية الشفافة (DEX Hack) فوق الشارت
+    document.getElementById('ov-entry').innerText = entryStr;
+    document.getElementById('ov-tp').innerText = tpStr;
+    document.getElementById('ov-sl').innerText = slStr;
 }
 
-// اختيار العملة من النافذة
 function selectToken(token) {
-    // إغلاق النافذة
     closeSearchModal();
-    
-    // تحديث زر البحث ليعرض العملة المختارة
-    document.getElementById('current-search-display').innerText = `${token.symbol.replace("USDT", "")} / USDT`;
-    
+    document.getElementById('current-search-display').innerText = `${token.name} / USDT`;
     const tvSymbol = `${token.exchange}:${token.symbol}`;
     
     loadChart(tvSymbol);
     generateAI(token);
 }
 
-// التحميل الافتراضي (البيتكوين)
+// تشغيل جلب البيانات عند بدء الموقع
 window.onload = function() {
-    if(window.TradingView) {
-        selectToken(tokens[0]); 
-    }
-}
+    fetchBinanceMarkets();
+};
