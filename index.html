@@ -43,32 +43,44 @@
             </button>
         </div>
 
-        <div id="tv-home-chart" class="chart"></div>
-
-        <div class="ai-signals-container" id="ai-signals" style="display: none;">
+        <div id="tv-home-chart" class="chart"></
+                    <div class="ai-signals-container" id="ai-signals" style="display: none;">
             <div class="ai-header">
                 <div class="pulse-dot"></div>
-                <span id="ai-title">AlphaSignals AI: Analyzing...</span>
+                <span id="ai-title">AlphaSignals Quantum AI: Scanning L2 Orderbook...</span>
             </div>
+
+            <div class="depth-container">
+                <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:bold; margin-bottom:5px;">
+                    <span class="text-green" id="bids-text">Buying Pressure: 50%</span>
+                    <span class="text-red" id="asks-text">Selling Pressure: 50%</span>
+                </div>
+                <div class="depth-bar">
+                    <div class="depth-bids" id="depth-bids-fill" style="width: 50%;"></div>
+                    <div class="depth-asks" id="depth-asks-fill" style="width: 50%;"></div>
+                </div>
+            </div>
+
             <div class="ai-grid">
                 <div class="ai-card">
-                    <div class="ai-label">Market Bias</div>
+                    <div class="ai-label">Live Market Bias</div>
                     <div class="ai-value" id="ai-bias">-</div>
                 </div>
                 <div class="ai-card">
-                    <div class="ai-label">Mathematical Entry</div>
+                    <div class="ai-label">Current Entry</div>
                     <div class="ai-value" id="ai-entry">-</div>
                 </div>
                 <div class="ai-card">
-                    <div class="ai-label">Take Profit (TP)</div>
+                    <div class="ai-label">Smart Target (TP)</div>
                     <div class="ai-value ai-green" id="ai-tp">-</div>
                 </div>
                 <div class="ai-card">
-                    <div class="ai-label">Stop Loss (SL)</div>
+                    <div class="ai-label">Dynamic Stop (SL)</div>
                     <div class="ai-value ai-red" id="ai-sl">-</div>
                 </div>
             </div>
         </div>
+
     </section>
 
     <div id="search-modal" class="modal-overlay" onclick="closeSearchModal(event)">
