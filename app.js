@@ -1,39 +1,47 @@
 let tokens = [];
-let currentTab = 'all';
 
-// سحب بيانات السوق الحية بأمان وسرعة من Binance
-async function fetchBinanceMarkets() {
+// الاتصال المباشر بـ Hyperliquid API لسحب العملات وأسعارها
+async function fetchHyperliquidMarkets() {
     try {
-        const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
+        const response = await fetch('https://api.hyperliquid.xyz/info', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: "metaAndAssetCtxs" })
+        });
         const data = await response.json();
         
-        // جلب أفضل 300 عملة حسب السيولة
-        const usdtPairs = data.filter(d => d.symbol.endsWith('USDT') && parseFloat(d.quoteVolume) > 1000000)
-                              .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
-                              .slice(0, 300);
+        const universe = data[0].universe; // أسماء العملات (BTC, ETH, HYPE...)
+        const contexts = data[1];          // أسعارها وسيولتها الحية
 
-        tokens = usdtPairs.map(d => ({
-            symbol: d.symbol,
-            name: d.symbol.replace('USDT', ''),
-            price: parseFloat(d.lastPrice),
-            change: parseFloat(d.priceChangePercent),
-            type: parseFloat(d.quoteVolume) > 50000000 ? 'perps' : 'spot',
-            exchange: "BINANCE"
-        }));
+        tokens = universe.map((u, index) => {
+            const ctx = contexts[index];
+            const currentPrice = parseFloat(ctx.markPx);
+            const prevPrice = parseFloat(ctx.prevDayPx);
+            const change = prevPrice > 0 ? ((currentPrice - prevPrice) / prevPrice) * 100 : 0;
 
-        tokens.unshift({ symbol: "HYPEUSDT", name: "HYPE", price: 62.50, change: 8.4, type: "perps", exchange: "BYBIT" });
+            return {
+                symbol: u.name,          // مثل: BTC
+                name: u.name,
+                price: currentPrice,
+                change: change,
+                volume: parseFloat(ctx.dayNtlVlm),
+                type: 'perps'
+            };
+        }).sort((a, b) => b.volume - a.volume); // ترتيب حسب قوة السيولة
+
+        // تحديث إحصائيات الصفحة
+        document.getElementById('asset-count').innerText = `${tokens.length}+`;
 
         updateTickerBar();
         renderTokens();
         
-        // التحميل التلقائي لأول عملة (البيتكوين)
+        // تشغيل البيتكوين أو أول عملة كافتراضي
         if(tokens.length > 0) {
-            const defaultToken = tokens.find(t => t.name === 'BTC') || tokens[0];
-            selectToken(defaultToken);
+            selectToken(tokens.find(t => t.symbol === 'BTC') || tokens[0]);
         }
     } catch (error) {
-        console.error("API Error:", error);
-        document.getElementById('modal-token-list').innerHTML = '<div class="loader-text" style="color: #ff3d00;">Connection failed. Retrying...</div>';
+        console.error("Hyperliquid API Error:", error);
+        document.getElementById('modal-token-list').innerHTML = '<div class="loader-text" style="color: #ff3d00;">Failed to connect to Hyperliquid L1.</div>';
     }
 }
 
@@ -41,7 +49,7 @@ function updateTickerBar() {
     const top20 = tokens.slice(0, 20);
     const tickerText = top20.map(t => {
         const sign = t.change >= 0 ? '+' : '';
-        return `${t.name} $${t.price.toFixed(t.price < 1 ? 4 : 2)} (${sign}${t.change.toFixed(2)}%)`;
+        return `${t.symbol} $${t.price.toFixed(t.price < 1 ? 4 : 2)} (${sign}${t.change.toFixed(2)}%)`;
     }).join('  •  ');
     document.getElementById('live-ticker-track').innerText = tickerText;
 }
@@ -58,24 +66,18 @@ function closeSearchModal(event) {
 }
 
 function setTab(tabName, btnElement) {
-    currentTab = tabName;
     const tabs = document.getElementsByClassName('tab-btn');
     for(let i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
     btnElement.classList.add('active');
     renderTokens();
 }
 
-// عرض القائمة داخل النافذة بشكل نظيف
 function renderTokens() {
     const input = document.getElementById('modal-search-input').value.toUpperCase();
     const listContainer = document.getElementById('modal-token-list');
     listContainer.innerHTML = '';
 
-    const filtered = tokens.filter(t => {
-        const matchesSearch = t.symbol.includes(input);
-        const matchesTab = currentTab === 'all' || t.type === currentTab;
-        return matchesSearch && matchesTab;
-    });
+    const filtered = tokens.filter(t => t.symbol.includes(input));
 
     filtered.forEach(t => {
         const div = document.createElement('div');
@@ -88,8 +90,8 @@ function renderTokens() {
 
         div.innerHTML = `
             <div class="token-symbol-box">
-                <span class="token-symbol">${t.name}</span>
-                <span class="token-type-badge">${t.type}</span>
+                <span class="token-symbol">${t.symbol}</span>
+                <span class="token-type-badge">PERP</span>
             </div>
             <div class="token-price">$${priceFmt}</div>
             <div class="token-change" style="color: ${changeColor}">${changeSign}${t.change.toFixed(2)}%</div>
@@ -98,13 +100,18 @@ function renderTokens() {
     });
 }
 
-// تحميل الشارت النظيف المريح للعين (بدون RSI أو إضافات معقدة)
-function loadChart(symbolConfig) {
+// تحميل شارت TradingView بصورة نقية
+function loadChart(coinName) {
     document.getElementById('tv-home-chart').innerHTML = '';
+    
+    // خدعة هندسية: نحول اسم عملة هايبر ليكويد لصيغة يقبلها الشارت (Binance أو Bybit)
+    let tvSymbol = `BINANCE:${coinName}USDT`;
+    if (coinName === 'HYPE' || coinName === 'PURR') tvSymbol = `BYBIT:${coinName}USDT`; // HYPE غير موجودة في بينانس
+
     new TradingView.widget({
         container_id: 'tv-home-chart',
         autosize: true,
-        symbol: symbolConfig,
+        symbol: tvSymbol,
         interval: '15',
         timezone: 'Etc/UTC',
         theme: 'dark',
@@ -114,86 +121,78 @@ function loadChart(symbolConfig) {
         enable_publishing: false,
         hide_side_toolbar: false,
         allow_symbol_change: false,
-        studies: [] // الشارت نقي تماماً
+        studies: [] // الشارت نقي وخالي من المؤشرات المزعجة
     });
 }
 
-// العقل المدبر الحقيقي: جلب دفتر الأوامر وتحليل سيولة الحيتان (L2 Orderbook)
+// قلب النظام: سحب سجل الأوامر الحي (L2 Book) من Hyperliquid وتحليله
 async function generateAI(token) {
     const aiBox = document.getElementById('ai-signals');
     aiBox.style.display = 'block';
     
-    document.getElementById('ai-title').innerText = `Quantum AI: Scanning Orderbook for ${token.name} / USDT...`;
-    
-    // إظهار حالة التحميل
+    document.getElementById('ai-title').innerText = `AlphaSignals AI: Scanning Hyperliquid L2 Orderbook for ${token.symbol}...`;
     document.getElementById('ai-bias').innerText = "SCANNING...";
     document.getElementById('ai-bias').className = "ai-value";
-    
+
     try {
-        // الاتصال الفعلي بـ API لجلب الطلبات الحية (أول 50 طلب بيع وشراء)
-        const response = await fetch(`https://api.binance.com/api/v3/depth?symbol=${token.symbol}&limit=50`);
-        const depth = await response.json();
+        // سحب دفتر الأوامر من Hyperliquid API!
+        const res = await fetch('https://api.hyperliquid.xyz/info', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: "l2Book", coin: token.symbol })
+        });
+        const data = await res.json();
         
-        // حساب إجمالي حجم أموال المشترين (Bids) والبائعين (Asks)
-        let totalBids = 0;
-        let totalAsks = 0;
+        const bids = data.levels[0]; // طلبات الشراء
+        const asks = data.levels[1]; // طلبات البيع
         
-        depth.bids.forEach(bid => totalBids += parseFloat(bid[0]) * parseFloat(bid[1]));
-        depth.asks.forEach(ask => totalAsks += parseFloat(ask[0]) * parseFloat(ask[1]));
-        
-        const totalVolume = totalBids + totalAsks;
-        const bidPercent = (totalBids / totalVolume) * 100;
-        const askPercent = (totalAsks / totalVolume) * 100;
-        
-        // تحديث شريط السيولة البصري (Hyperliquid Style)
+        let totalBids = 0; bids.forEach(b => totalBids += parseFloat(b.sz) * parseFloat(b.px));
+        let totalAsks = 0; asks.forEach(a => totalAsks += parseFloat(a.sz) * parseFloat(a.px));
+
+        const totalVol = totalBids + totalAsks;
+        // حساب الضغط المئوي للسيولة
+        const bidPercent = totalVol > 0 ? (totalBids / totalVol) * 100 : 50;
+        const askPercent = totalVol > 0 ? (totalAsks / totalVol) * 100 : 50;
+
+        // تحديث شريط السيولة المرئي
         document.getElementById('depth-bids-fill').style.width = `${bidPercent}%`;
         document.getElementById('depth-asks-fill').style.width = `${askPercent}%`;
-        document.getElementById('bids-text').innerText = `Buying Vol: ${bidPercent.toFixed(1)}%`;
-        document.getElementById('asks-text').innerText = `Selling Vol: ${askPercent.toFixed(1)}%`;
-        
-        // اتخاذ قرار الذكاء الاصطناعي بناءً على الأموال الحقيقية في السوق!
+        document.getElementById('bids-text').innerText = `Buying Volume: ${bidPercent.toFixed(1)}%`;
+        document.getElementById('asks-text').innerText = `Selling Volume: ${askPercent.toFixed(1)}%`;
+
+        // اتخاذ القرار بناءً على السيولة الحقيقية
         const isLong = bidPercent > askPercent;
         const bias = isLong ? "STRONG LONG" : "STRONG SHORT";
-        
-        // حساب مناطق الأهداف بناءً على السعر الحالي
         const entry = token.price;
-        // تقريب الهدف والوقف بناءً على قوة السيولة
-        const volatilityMultiplier = isLong ? (bidPercent / 100) : (askPercent / 100);
         
-        const tp = isLong ? entry * (1 + (0.04 * volatilityMultiplier)) : entry * (1 - (0.04 * volatilityMultiplier));
-        const sl = isLong ? entry * 0.98 : entry * 1.02;
+        // كلما زادت السيولة زاد الهدف
+        const strength = isLong ? (bidPercent/100) : (askPercent/100);
+        const tp = isLong ? entry * (1 + (0.04 * strength)) : entry * (1 - (0.04 * strength));
+        const sl = isLong ? entry * 0.985 : entry * 1.015;
 
         const precision = entry < 1 ? 4 : 2;
 
-        // عرض النتائج
-        const biasEl = document.getElementById('ai-bias');
-        biasEl.innerText = bias;
-        biasEl.className = `ai-value ${isLong ? 'ai-green' : 'ai-red'}`;
-        
+        document.getElementById('ai-bias').innerText = bias;
+        document.getElementById('ai-bias').className = `ai-value ${isLong ? 'ai-green' : 'ai-red'}`;
         document.getElementById('ai-entry').innerText = `$${entry.toFixed(precision)}`;
         document.getElementById('ai-tp').innerText = `$${tp.toFixed(precision)}`;
         document.getElementById('ai-sl').innerText = `$${sl.toFixed(precision)}`;
 
-    } catch (error) {
-        console.error("Depth API Error:", error);
-        document.getElementById('ai-title').innerText = "AI Feed Disconnected. Using Math Model.";
-        // Fallback في حالة ضعف الإنترنت
+    } catch (e) {
+        console.error("L2 Book Error:", e);
+        document.getElementById('ai-title').innerText = "Data Feed Error. Try again.";
     }
 }
 
-}
-
-// عند اختيار العملة
 function selectToken(token) {
     closeSearchModal();
-    document.getElementById('current-search-display').innerText = `${token.name} / USDT`;
+    document.getElementById('current-search-display').innerText = `${token.symbol} / USD (Perp)`;
     
-    const tvSymbol = `${token.exchange}:${token.symbol}`;
-    loadChart(tvSymbol);
+    loadChart(token.symbol);
     generateAI(token);
 }
 
-// بدء التشغيل
+// التشغيل الفوري
 window.onload = function() {
-    fetchBinanceMarkets();
+    fetchHyperliquidMarkets();
 };
