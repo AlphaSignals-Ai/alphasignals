@@ -72,7 +72,7 @@
             font-size: 1rem;
             outline: none;
         }
-        button {
+        .submit-btn {
             flex: 1;
             background: var(--accent-color);
             color: #090d16;
@@ -84,7 +84,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        button:hover {
+        .submit-btn:hover {
             box-shadow: 0 0 15px rgba(0, 230, 118, 0.4);
         }
         .code-section {
@@ -93,11 +93,31 @@
             border-top: 1px solid var(--border-color);
             padding-top: 30px;
         }
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
         .code-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--text-main);
-            margin-bottom: 10px;
             font-weight: 600;
+        }
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--accent-color);
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: var(--accent-color);
+            color: #090d16;
         }
         .code-box {
             background: #090d16;
@@ -109,6 +129,7 @@
             color: #79c0ff;
             overflow-x: auto;
             white-space: pre;
+            max-height: 250px;
         }
     </style>
 </head>
@@ -121,13 +142,16 @@
         
         <form action="https://formspree.io/f/xpqewykp" method="POST">
             <input type="email" name="email" placeholder="Enter your European trading email..." required>
-            <button type="submit">Join Waitlist</button>
+            <button type="submit" class="submit-btn">Join Waitlist</button>
         </form>
 
         <div class="code-section">
-            <div class="code-title">🛠️ Free Gift: AlphaSignals Smart Momentum Script (Pine Script v5)</div>
-            <p style="font-size: 0.95rem; margin-bottom: 15px;">Copy the code below, open TradingView -> Pine Editor -> Paste and Add to Chart to see high-probability Buy/Sell setups.</p>
-            <div class="code-box">//@version=5
+            <div class="code-header">
+                <div class="code-title">🛠️ Free Gift: Pine Script v5 Indicator</div>
+                <button class="copy-btn" onclick="copyCode()">Copy Code</button>
+            </div>
+            <p style="font-size: 0.95rem; margin-bottom: 15px; color: var(--text-muted);">Open TradingView -> Pine Editor -> Paste and Add to Chart.</p>
+            <div class="code-box" id="pineCode">//@version=5
 indicator("AlphaSignals AI - Smart Momentum Scalper", overlay=true)
 
 // Inputs for RSI & MACD
@@ -150,6 +174,25 @@ plotshape(buyCondition, title="Buy Signal", style=shape.triangleup, location=loc
 plotshape(sellCondition, title="Sell Signal", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small, text="ALPHA SELL")</div>
         </div>
     </div>
+
+    <script>
+        function copyCode() {
+            const codeText = document.getElementById("pineCode").innerText;
+            navigator.clipboard.writeText(codeText).then(() => {
+                const btn = document.querySelector(".copy-btn");
+                btn.innerText = "Copied! 🎉";
+                btn.style.background = "#00e676";
+                btn.style.color = "#090d16";
+                setTimeout(() => {
+                    btn.innerText = "Copy Code";
+                    btn.style.background = "rgba(255, 255, 255, 0.05)";
+                    btn.style.color = "#00e676";
+                }, 2000);
+            }).catch(err => {
+                alert("Failed to copy code. Please select and copy manually.");
+            });
+        }
+    </script>
 
 </body>
 </html>
