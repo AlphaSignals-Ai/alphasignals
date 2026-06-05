@@ -8,7 +8,7 @@
         :root {
             --bg-color: #090d16;
             --container-bg: #111726;
-            --accent-color: #00e676; /* Green for profit/trading */
+            --accent-color: #00e676; 
             --text-main: #ffffff;
             --text-muted: #94a3b8;
             --border-color: #1f293d;
@@ -18,12 +18,11 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: block;
-            padding: 60px 20px;
+            padding: 40px 20px;
             text-align: center;
         }
         .container {
-            max-width: 650px;
+            max-width: 700px;
             margin: 0 auto;
             background: var(--container-bg);
             padding: 40px 30px;
@@ -60,13 +59,12 @@
             padding: 8px;
             border-radius: 30px;
             border: 1px solid var(--border-color);
-            display: table;
+            display: flex;
             width: 100%;
             margin-bottom: 25px;
         }
         input[type="email"] {
-            display: table-cell;
-            width: 70%;
+            flex: 2;
             background: transparent;
             border: none;
             padding: 12px 20px;
@@ -75,8 +73,7 @@
             outline: none;
         }
         button {
-            display: table-cell;
-            width: 30%;
+            flex: 1;
             background: var(--accent-color);
             color: #090d16;
             border: none;
@@ -88,12 +85,30 @@
             transition: all 0.3s ease;
         }
         button:hover {
-            transform: scale(1.02);
             box-shadow: 0 0 15px rgba(0, 230, 118, 0.4);
         }
-        .footer-note {
-            font-size: 0.85rem;
-            color: var(--text-muted);
+        .code-section {
+            margin-top: 40px;
+            text-align: left;
+            border-top: 1px solid var(--border-color);
+            padding-top: 30px;
+        }
+        .code-title {
+            font-size: 1.2rem;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .code-box {
+            background: #090d16;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: #79c0ff;
+            overflow-x: auto;
+            white-space: pre;
         }
     </style>
 </head>
@@ -109,7 +124,31 @@
             <button type="submit">Join Waitlist</button>
         </form>
 
-        <div class="footer-note">🔒 Zero Spam. Unsubscribe anytime. Powered by AlphaSignals AI.</div>
+        <div class="code-section">
+            <div class="code-title">🛠️ Free Gift: AlphaSignals Smart Momentum Script (Pine Script v5)</div>
+            <p style="font-size: 0.95rem; margin-bottom: 15px;">Copy the code below, open TradingView -> Pine Editor -> Paste and Add to Chart to see high-probability Buy/Sell setups.</p>
+            <div class="code-box">//@version=5
+indicator("AlphaSignals AI - Smart Momentum Scalper", overlay=true)
+
+// Inputs for RSI & MACD
+rsiLength = input.int(14, title="RSI Length")
+rsiSource = input.source(close, title="RSI Source")
+fastLength = input.int(12, title="MACD Fast Length")
+slowLength = input.int(26, title="MACD Slow Length")
+signalLength = input.int(9, title="MACD Signal Length")
+
+// Calculate Metrics
+rsiVal = ta.rsi(rsiSource, rsiLength)
+[macdLine, signalLine, _] = ta.macd(close, fastLength, slowLength, signalLength)
+
+// Trading Logic Conditions
+buyCondition = (rsiVal < 35 and ta.crossover(macdLine, signalLine))
+sellCondition = (rsiVal > 65 and ta.crossunder(macdLine, signalLine))
+
+// Plot Signals on the Chart
+plotshape(buyCondition, title="Buy Signal", style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small, text="ALPHA BUY")
+plotshape(sellCondition, title="Sell Signal", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small, text="ALPHA SELL")</div>
+        </div>
     </div>
 
 </body>
