@@ -79,20 +79,30 @@
             padding: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
         }
-        .terminal-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
+        /* أزرار التبديل السريع */
+        .crypto-tabs {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 10px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
         }
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #ff3d00;
-            border-radius: 50%;
-            animation: blink 1.5s infinite;
+        .tab-btn {
+            background: #060913;
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background: var(--accent-color);
+            color: #060913;
+            border-color: var(--accent-color);
         }
         .widget-wrapper {
             width: 100%;
@@ -162,7 +172,7 @@
 <body>
 
     <div class="header-section">
-        <div class="badge">PRO QUANT TERMINAL v3.0</div>
+        <div class="badge">PRO QUANT TERMINAL v3.5</div>
         <h1>AlphaSignals <span>Intelligence</span> Hub</h1>
         <p>Real-time machine-learning technical analysis, automated target hunting, and predictive indicators.</p>
         
@@ -173,9 +183,11 @@
     </div>
 
     <div class="terminal-container">
-        <div class="terminal-title">
-            <div class="live-dot"></div>
-            <span>AlphaSignals Pro Live Institutional Terminal</span>
+        <div class="crypto-tabs">
+            <button class="tab-btn active" onclick="switchPair('BINANCE:BTCUSDT', 'BTC / USDT', 'LONG ENTRY', '$63,120', '$64,750', '$62,100', this)">⚡ BTC (Bitcoin)</button>
+            <button class="tab-btn" onclick="switchPair('BINANCE:WLDUSDT', 'WLD / USDT', 'SHORT ENTRY', '$0.5510', '$0.5180', '$0.5790', this)">🧬 WLD (Worldcoin)</button>
+            <button class="tab-btn" onclick="switchPair('BYBIT:HYPEUSDT', 'HYPE / USDT', 'SHORT ENTRY', '$62.50', '$58.20', '$65.90', this)">🔥 HYPE (Hyperliquid)</button>
+            <button class="tab-btn" onclick="switchPair('BINANCE:SOLUSDT', 'SOL / USDT', 'LONG ENTRY', '$165.40', '$174.00', '$159.20', this)">☀️ SOL (Solana)</button>
         </div>
         
         <div class="widget-wrapper">
@@ -202,8 +214,8 @@
                         <td id="asset-name">BTC / USDT</td>
                         <td id="asset-type" class="signal-type-long">LONG ENTRY</td>
                         <td id="asset-entry">$63,120</td>
-                        <td id="asset-tp" style="color: #00e676;">$64,380</td>
-                        <td id="asset-sl" style="color: #ff3d00;">$62,150</td>
+                        <td id="asset-tp" style="color: #00e676;">$64,750</td>
+                        <td id="asset-sl" style="color: #ff3d00;">$62,100</td>
                     </tr>
                 </tbody>
             </table>
@@ -212,52 +224,55 @@
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="text/javascript">
-        // إنشاء الشارت وبث الأسعار الفورية
-        var tvWidget = new TradingView.widget({
-            "autosize": true,
-            "symbol": "BINANCE:BTCUSDT",
-            "interval": "15",
-            "timezone": "Etc/UTC",
-            "theme": "dark",
-            "style": "1",
-            "locale": "en",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_side_toolbar": true, 
-            "allow_symbol_change": true,
-            "container_id": "tradingview_widget"
-        });
+        // الدالة المسؤولة عن بناء وتحديث الشارت مجاناً
+        function loadChart(symbolName) {
+            document.getElementById("tradingview_widget").innerHTML = ""; // تفريغ الحاوية
+            new TradingView.widget({
+                "width": "100%",
+                "height": "100%",
+                "symbol": symbolName,
+                "interval": "15",
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "hide_side_toolbar": true, 
+                "allow_symbol_change": false, // إلغاء التغيير الداخلي العشوائي لضمان المزامنة
+                "container_id": "tradingview_widget"
+            });
+        }
 
-        // محاذاة ذكية جافا سكريبت: رصد تغيير المستخدم للعملة وتحديث البيانات فوراً
-        setInterval(function() {
-            if (typeof tvWidget !== 'undefined' && tvWidget.options) {
-                var currentSymbol = tvWidget.options.symbol.split(":")[1] || tvWidget.options.symbol;
-                
-                // جلب أسعار تقريبية فورية لحساب الأهداف بدقة بناءً على اسم العملة المفتوحة
-                document.getElementById("asset-name").innerText = currentSymbol.replace("USDT", " / USDT");
-                
-                if (currentSymbol.includes("BTC")) {
-                    document.getElementById("asset-type").innerText = "LONG ENTRY";
-                    document.getElementById("asset-type").className = "signal-type-long";
-                    document.getElementById("asset-entry").innerText = "$63,120";
-                    document.getElementById("asset-tp").innerText = "$64,750";
-                    document.getElementById("asset-sl").innerText = "$62,100";
-                } else if (currentSymbol.includes("WLD")) {
-                    document.getElementById("asset-type").innerText = "SHORT ENTRY";
-                    document.getElementById("asset-type").className = "signal-type-short";
-                    document.getElementById("asset-entry").innerText = "$0.5510";
-                    document.getElementById("asset-tp").innerText = "$0.5180";
-                    document.getElementById("asset-sl").innerText = "$0.5790";
-                } else {
-                    // حسابات تلقائية ذكية لأي عملة أخرى يكتبها المستخدم لمنع توقف الجدول
-                    document.getElementById("asset-type").innerText = "SCALPING DETECTED";
-                    document.getElementById("asset-type").className = "signal-type-long";
-                    document.getElementById("asset-entry").innerText = "Live Pricing...";
-                    document.getElementById("asset-tp").innerText = "Auto Hunting...";
-                    document.getElementById("asset-sl").innerText = "Calculated...";
-                }
+        // تحميل الشارت الافتراضي للبيتكوين عند فتح الصفحة لأول مرة
+        loadChart("BINANCE:BTCUSDT");
+
+        // الدالة السحرية للربط والتحديث التلقائي الفوري بين الزر والجدول والشارت
+        function switchPair(tradingviewSymbol, displayName, recommendation, entry, tp, sl, element) {
+            // 1. تحديث الشارت بالعملة الجديدة فوراً
+            loadChart(tradingviewSymbol);
+            
+            // 2. تحديث الجدول السفلي بالبيانات المقابلة بدقة متناهية
+            document.getElementById("asset-name").innerText = displayName;
+            document.getElementById("asset-type").innerText = recommendation;
+            document.getElementById("asset-entry").innerText = entry;
+            document.getElementById("asset-tp").innerText = tp;
+            document.getElementById("asset-sl").innerText = sl;
+            
+            // ضبط لون التوصية (أخضر للـ LONG وأحمر للـ SHORT)
+            if (recommendation.includes("LONG")) {
+                document.getElementById("asset-type").className = "signal-type-long";
+            } else {
+                document.getElementById("asset-type").className = "signal-type-short";
             }
-        }, 2000); // يفحص ويحدث كل ثانيتين تلقائياً
+            
+            // 3. تغيير مظهر الزر النشط حالياً ليعرف المستخدم أين يقف
+            var buttons = document.getElementsByClassName("tab-btn");
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+            }
+            element.classList.add("active");
+        }
     </script>
 
 </body>
