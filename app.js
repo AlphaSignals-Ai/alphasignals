@@ -1,52 +1,52 @@
 let tokens = [];
-let currentTab = 'all';
 
-// جلب بيانات السوق الحية من Binance API
+// جلب جميع البيانات الحية من Binance (سعر ونسبة تغير)
 async function fetchBinanceMarkets() {
     try {
         const response = await fetch('https://api.binance.com/api/v3/ticker/24hr');
         const data = await response.json();
         
-        // تصفية أزواج USDT وترتيبها حسب حجم التداول (Volume) لأقوى 150 عملة
-        const usdtPairs = data.filter(d => d.symbol.endsWith('USDT'))
+        // استخراج أزواج USDT القوية (أكثر من 300 عملة)
+        const usdtPairs = data.filter(d => d.symbol.endsWith('USDT') && parseFloat(d.quoteVolume) > 1000000)
                               .sort((a, b) => parseFloat(b.quoteVolume) - parseFloat(a.quoteVolume))
-                              .slice(0, 150);
+                              .slice(0, 300);
 
         tokens = usdtPairs.map(d => ({
             symbol: d.symbol,
             name: d.symbol.replace('USDT', ''),
             price: parseFloat(d.lastPrice),
-            volume: parseFloat(d.quoteVolume),
-            type: parseFloat(d.quoteVolume) > 50000000 ? 'perps' : 'spot', // تصنيف وهمي للفيوتشر حسب السيولة
+            change: parseFloat(d.priceChangePercent),
             exchange: "BINANCE"
         }));
 
-        // إضافة HYPE يدوياً لأنها في Bybit/Hyperliquid
-        tokens.unshift({ symbol: "HYPEUSDT", name: "HYPE", price: 62.50, volume: 99999999, type: "perps", exchange: "BYBIT" });
+        // إضافة عملة HYPE يدوياً لضمان وجودها
+        tokens.unshift({ symbol: "HYPEUSDT", name: "HYPE", price: 62.50, change: 8.4, exchange: "BYBIT" });
 
         updateTickerBar();
         renderTokens();
         
-        // تحميل أول عملة تلقائياً
-        if(tokens.length > 0) selectToken(tokens[0]);
+        // تحميل البيتكوين افتراضياً
+        if(tokens.length > 0) selectToken(tokens.find(t => t.name === 'BTC') || tokens[0], true);
 
     } catch (error) {
         console.error("API Fetch Error:", error);
-        document.getElementById('modal-token-list').innerHTML = '<div class="loader-text text-red">Failed to load API. Please refresh.</div>';
+        document.getElementById('modal-token-list').innerHTML = '<div class="loader-text text-red">Connection failed. Retrying...</div>';
     }
 }
 
-// تحديث شريط الأسعار المتحرك بالأعلى
 function updateTickerBar() {
-    const top10 = tokens.slice(0, 15);
-    const tickerText = top10.map(t => `${t.name} $${t.price.toFixed(t.price < 1 ? 4 : 2)}`).join('  •  ');
+    const top20 = tokens.slice(0, 20);
+    const tickerText = top20.map(t => {
+        const sign = t.change >= 0 ? '+' : '';
+        return `${t.name} $${t.price.toFixed(t.price < 1 ? 4 : 2)} (${sign}${t.change.toFixed(2)}%)`;
+    }).join('  •  ');
     document.getElementById('live-ticker-track').innerText = tickerText;
 }
 
 function handleNav(section) {
     if(section === 'home') window.scrollTo({top: 0, behavior: 'smooth'});
     else if(section === 'terminal') document.getElementById('terminal-section').scrollIntoView({behavior: 'smooth', block: 'start'});
-    else alert("🔒 This module requires Pro Access.");
+    else alert("🔒 This section is under maintenance.");
 }
 
 function openSearchModal() {
@@ -60,48 +60,28 @@ function closeSearchModal(event) {
     document.getElementById('search-modal').style.display = 'none';
 }
 
-function setTab(tabName, btnElement) {
-    currentTab = tabName;
-    const tabs = document.getElementsByClassName('tab-btn');
-    for(let i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
-    btnElement.classList.add('active');
-    renderTokens();
-}
-
-// رسم قائمة العملات المستدعاة من الـ API
 function renderTokens() {
     const input = document.getElementById('modal-search-input').value.toUpperCase();
     const listContainer = document.getElementById('modal-token-list');
     listContainer.innerHTML = '';
 
-    if (tokens.length === 0) {
-        listContainer.innerHTML = '<div class="loader-text">Loading APIs...</div>';
-        return;
-    }
-
-    const filtered = tokens.filter(t => {
-        const matchesSearch = t.symbol.includes(input);
-        const matchesTab = currentTab === 'all' || t.type === currentTab;
-        return matchesSearch && matchesTab;
-    });
+    const filtered = tokens.filter(t => t.symbol.includes(input));
 
     filtered.forEach(t => {
         const div = document.createElement('div');
         div.className = 'token-item';
-        div.onclick = () => selectToken(t);
+        div.onclick = () => selectToken(t, false);
         
-        const priceFmt = t.price < 1 ? t.price.toFixed(4) : t.price.toFixed(2);
-        const volFmt = (t.volume / 1000000).toFixed(1) + 'M';
+        const priceFmt = t.price < 1 ? t.price.toFixed(5) : t.price.toFixed(2);
+        const changeColor = t.change >= 0 ? 'var(--accent)' : 'var(--red)';
+        const changeSign = t.change >= 0 ? '+' : '';
 
         div.innerHTML = `
-            <div>
-                <div class="token-symbol">${t.name} <span style="font-size:0.6rem; background:#2A2E39; padding:2px 4px; border-radius:4px;">${t.type.toUpperCase()}</span></div>
-                <div class="token-name">${t.exchange}</div>
+            <div class="token-symbol-box">
+                <span class="token-symbol">${t.name}</span>
             </div>
-            <div>
-                <div class="token-price">$${priceFmt}</div>
-                <div class="token-vol">Vol: $${volFmt}</div>
-            </div>
+            <div class="token-price">$${priceFmt}</div>
+            <div class="token-change" style="color: ${changeColor}">${changeSign}${t.change.toFixed(2)}%</div>
         `;
         listContainer.appendChild(div);
     });
@@ -122,63 +102,82 @@ function loadChart(symbolConfig) {
         enable_publishing: false,
         hide_side_toolbar: false,
         allow_symbol_change: false,
-        studies: ["RSI@tv-basicstudies"]
+        // إزالة RSI تماماً كما طلبت
+        studies: [] 
     });
 }
 
-// توليد التوصيات وتحديث اللوحة الطافية وصندوق التداول
-function generateAI(token) {
-    document.getElementById('ai-signals').style.display = 'block';
-    document.getElementById('chart-overlay').style.display = 'block'; // إظهار اللوحة الطافية
+// دالة الذكاء الاصطناعي مع ليزر المسح ومسار التوقع (AI Projection)
+function simulateAnalysis(token, isInitialLoad) {
+    const scanner = document.getElementById('ai-scanner');
+    const scanningText = document.getElementById('ai-scanning-text');
+    const predictionPath = document.getElementById('prediction-path');
+    const orderBar = document.getElementById('sleek-order-bar');
+    const liveDot = document.getElementById('live-dot');
     
-    const isLong = Math.random() > 0.45;
-    const entry = token.price;
-    const tp = isLong ? entry * 1.04 : entry * 0.96;
-    const sl = isLong ? entry * 0.98 : entry * 1.02;
-    const precision = entry < 1 ? 4 : 2;
-
-    const entryStr = `$${entry.toFixed(precision)}`;
-    const tpStr = `$${tp.toFixed(precision)}`;
-    const slStr = `$${sl.toFixed(precision)}`;
-
-    // 1. تحديث صندوق التداول الاحترافي السفلي
-    const biasBadge = document.getElementById('ai-bias-badge');
-    const execBtn = document.getElementById('ai-execute-btn');
+    // إخفاء الأشرطة وبدء عملية المسح
+    orderBar.style.display = 'none';
+    predictionPath.style.display = 'none';
+    liveDot.style.display = 'none';
     
-    if (isLong) {
-        biasBadge.innerText = "LONG POSITION";
-        biasBadge.className = "trade-bias long";
-        execBtn.innerText = "Execute LONG via API";
-        execBtn.className = "execute-btn";
-        document.getElementById('ai-rr').innerText = "R:R 1:2.8";
-    } else {
-        biasBadge.innerText = "SHORT POSITION";
-        biasBadge.className = "trade-bias short";
-        execBtn.innerText = "Execute SHORT via API";
-        execBtn.className = "execute-btn short";
-        document.getElementById('ai-rr').innerText = "R:R 1:3.1";
+    if(!isInitialLoad) {
+        scanner.style.display = 'block';
+        scanningText.style.display = 'block';
     }
 
-    document.getElementById('ai-entry').innerText = entryStr;
-    document.getElementById('ai-tp').innerText = tpStr;
-    document.getElementById('ai-sl').innerText = slStr;
+    // محاكاة وقت التحليل الفني
+    setTimeout(() => {
+        scanner.style.display = 'none';
+        scanningText.style.display = 'none';
+        
+        // حساب التوقعات
+        const isLong = Math.random() > 0.45;
+        const entry = token.price;
+        const tp = isLong ? entry * 1.04 : entry * 0.96;
+        const sl = isLong ? entry * 0.98 : entry * 1.02;
+        const precision = entry < 1 ? 4 : 2;
 
-    // 2. تحديث اللوحة الطافية الشفافة (DEX Hack) فوق الشارت
-    document.getElementById('ov-entry').innerText = entryStr;
-    document.getElementById('ov-tp').innerText = tpStr;
-    document.getElementById('ov-sl').innerText = slStr;
+        // تحديث شريط التداول السلس (Sleek Order Bar)
+        const biasBadge = document.getElementById('slim-bias');
+        const execBtn = document.getElementById('slim-exec-btn');
+        
+        biasBadge.innerText = isLong ? "LONG ENTRY" : "SHORT ENTRY";
+        biasBadge.className = isLong ? "slim-bias-badge long" : "slim-bias-badge short";
+        execBtn.innerText = isLong ? "Execute LONG Order" : "Execute SHORT Order";
+        execBtn.className = isLong ? "slim-execute-btn" : "slim-execute-btn short";
+
+        document.getElementById('slim-entry').innerText = `$${entry.toFixed(precision)}`;
+        document.getElementById('slim-tp').innerText = `$${tp.toFixed(precision)}`;
+        document.getElementById('slim-tp').className = isLong ? "text-green" : "text-red";
+        document.getElementById('slim-sl').innerText = `$${sl.toFixed(precision)}`;
+        document.getElementById('slim-sl').className = isLong ? "text-red" : "text-green";
+
+        // رسم مسار التوقع المستقبلي المضيء على الحافة (الخدعة البصرية)
+        const svgPath = document.getElementById('svg-proj-line');
+        if (isLong) {
+            svgPath.setAttribute('d', 'M0,50 Q40,50 100,10'); // مسار صاعد
+            svgPath.setAttribute('stroke', '#00e676');
+        } else {
+            svgPath.setAttribute('d', 'M0,50 Q40,50 100,90'); // مسار هابط
+            svgPath.setAttribute('stroke', '#ff3d00');
+        }
+
+        orderBar.style.display = 'flex';
+        predictionPath.style.display = 'flex';
+        liveDot.style.display = 'inline-block';
+
+    }, isInitialLoad ? 0 : 1800); // 1.8 ثانية للمسح الضوئي
 }
 
-function selectToken(token) {
+function selectToken(token, isInitialLoad) {
     closeSearchModal();
     document.getElementById('current-search-display').innerText = `${token.name} / USDT`;
-    const tvSymbol = `${token.exchange}:${token.symbol}`;
     
+    const tvSymbol = `${token.exchange}:${token.symbol}`;
     loadChart(tvSymbol);
-    generateAI(token);
+    simulateAnalysis(token, isInitialLoad);
 }
 
-// تشغيل جلب البيانات عند بدء الموقع
 window.onload = function() {
     fetchBinanceMarkets();
 };
