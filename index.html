@@ -42,7 +42,7 @@
         h1 { font-size: 1.8rem; margin-bottom: 10px; }
         h1 span { color: var(--accent-color); }
         p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 15px; }
-        form {
+        form.waitlist-form {
             background: #060913;
             padding: 6px;
             border-radius: 30px;
@@ -78,20 +78,64 @@
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
         }
-        /* تضخيم شاشة الشارت الفخمة المستقرة لفتح الشموع */
+        /* محرك القائمة المنسدلة الخارجي الذكي الفخم */
+        .dropdown-container {
+            position: relative;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .custom-select-trigger {
+            background: #060913;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .custom-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #0d1222;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 5px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 999;
+            display: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .custom-option {
+            padding: 12px 15px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(30, 41, 59, 0.3);
+            transition: background 0.2s ease;
+        }
+        .custom-option:hover {
+            background: #1e293b;
+            color: var(--accent-color);
+        }
+        /* إجبار الشارت على أخذ مساحة طولية ثابتة ضخمة تمنع انضغاط الشموع نهائياً */
         .widget-wrapper {
             width: 100%;
-            height: 600px; 
-            min-height: 550px;
+            height: 550px; 
             border-radius: 8px;
             overflow: hidden;
+            margin-top: 20px;
         }
         .signals-box {
             background: #060913;
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 5px;
             text-align: left;
         }
         .signals-title {
@@ -138,21 +182,21 @@
             body { padding: 10px; }
             .header-section { padding: 15px; }
             h1 { font-size: 1.4rem; }
-            form { flex-direction: column; border-radius: 12px; padding: 10px; gap: 10px; }
-            input[type="email"] { background: #060913; border-radius: 8px; padding: 12px; }
-            button { border-radius: 8px; padding: 12px; }
-            .widget-wrapper { height: 500px; min-height: 500px; }
+            form.waitlist-form { flex-direction: column; border-radius: 12px; padding: 10px; gap: 10px; }
+            form.waitlist-form input[type="email"] { background: #060913; border-radius: 8px; padding: 12px; }
+            form.waitlist-form button { border-radius: 8px; padding: 12px; }
+            .widget-wrapper { height: 480px; }
         }
     </style>
 </head>
 <body>
 
     <div class="header-section">
-        <div class="badge">PRO QUANT TERMINAL v6.0</div>
+        <div class="badge">PRO QUANT TERMINAL v7.0</div>
         <h1>AlphaSignals <span>Intelligence</span> Hub</h1>
         <p>Real-time machine-learning technical analysis, automated target hunting, and predictive indicators.</p>
         
-        <form action="https://formspree.io/f/xpqewykp" method="POST">
+        <form class="waitlist-form" action="https://formspree.io/f/xpqewykp" method="POST">
             <input type="email" name="email" placeholder="Enter your business email for premium signals..." required>
             <button type="submit">Unlock Full Engine</button>
         </form>
@@ -160,6 +204,20 @@
 
     <div class="terminal-container">
         
+        <div class="dropdown-container">
+            <div class="custom-select-trigger" id="select-trigger" onclick="toggleDropdown()">
+                <span>📊 Select Crypto Asset to Analyze...</span>
+                <span>▼</span>
+            </div>
+            <div class="custom-options" id="dropdown-options">
+                <div class="custom-option" onclick="selectPair('BINANCE:BTCUSDT', 'BTC / USDT', 'LONG ENTRY', '$63,120', '$64,750', '$62,100')">🪙 BTC (Bitcoin)</div>
+                <div class="custom-option" onclick="selectPair('BINANCE:WLDUSDT', 'WLD / USDT', 'SHORT ENTRY', '$0.5510', '$0.5180', '$0.5790')">🧬 WLD (Worldcoin)</div>
+                <div class="custom-option" onclick="selectPair('BYBIT:HYPEUSDT', 'HYPE / USDT', 'SHORT ENTRY', '$62.50', '$58.20', '$65.90')">🔥 HYPE (Hyperliquid)</div>
+                <div class="custom-option" onclick="selectPair('BINANCE:SOLUSDT', 'SOL / USDT', 'LONG ENTRY', '$165.40', '$174.00', '$159.20')">☀️ SOL (Solana)</div>
+                <div class="custom-option" onclick="selectPair('BINANCE:ETHUSDT', 'ETH / USDT', 'LONG ENTRY', '$3,450', '$3,620', '$3,310')">💎 ETH (Ethereum)</div>
+            </div>
+        </div>
+
         <div class="signals-box">
             <div class="signals-title">
                 <div class="green-dot"></div>
@@ -195,57 +253,62 @@
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="text/javascript">
-        // استدعاء المنصة بنظام الـ Advanced Widget الشامل للقوائم المنسدلة
-        var widget = new TradingView.widget({
-            "width": "100%",
-            "height": "100%",
-            "symbol": "BINANCE:BTCUSDT",
-            "interval": "15",
-            "timezone": "Etc/UTC",
-            "theme": "dark",
-            "style": "1",
-            "locale": "en",
-            "toolbar_bg": "#f1f3f6",
-            "enable_publishing": false,
-            "hide_side_toolbar": true,
-            "allow_symbol_change": true, // تفعيل محرك البحث المنسدل الأصلي بآلاف العملات
-            "container_id": "tradingview_widget"
-        });
+        // دالة البناء الأساسية المستقرة والمحمية للأبعاد والثبات
+        function initChart(symbolName) {
+            document.getElementById("tradingview_widget").innerHTML = ""; 
+            new TradingView.widget({
+                "width": "100%",
+                "height": "100%",
+                "symbol": symbolName,
+                "interval": "15",
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "hide_side_toolbar": true,
+                "allow_symbol_change": false, // إلغاء محرك التداخل لمنع التضارب البرمجي وانكماش الشاشة
+                "container_id": "tradingview_widget"
+            });
+        }
 
-        // المزامنة الهندسية الذكية: تتبع الـ Ticker الذي يختاره العميل من القائمة المنسدلة وتحديث الجدول
-        setInterval(function() {
-            if (typeof widget !== 'undefined' && widget.options) {
-                var currentTicker = widget.options.symbol.split(":")[1] || widget.options.symbol;
-                document.getElementById("live-pair").innerText = currentTicker.replace("USDT", " / USDT");
+        // تشغيل أولي للبيتكوين
+        initChart("BINANCE:BTCUSDT");
 
-                // حسابات ديناميكية فورية حسب العملة لتبدو أوتوماتيكية بالكامل
-                if (currentTicker.includes("BTC")) {
-                    document.getElementById("live-bias").innerText = "LONG ENTRY";
-                    document.getElementById("live-bias").className = "signal-type-long";
-                    document.getElementById("live-entry").innerText = "$63,120";
-                    document.getElementById("live-tp").innerText = "$64,750";
-                    document.getElementById("live-sl").innerText = "$62,100";
-                } else if (currentTicker.includes("WLD")) {
-                    document.getElementById("live-bias").innerText = "SHORT ENTRY";
-                    document.getElementById("live-bias").className = "signal-type-short";
-                    document.getElementById("live-entry").innerText = "$0.5510";
-                    document.getElementById("live-tp").innerText = "$0.5180";
-                    document.getElementById("live-sl").innerText = "$0.5790";
-                } else if (currentTicker.includes("HYPE")) {
-                    document.getElementById("live-bias").innerText = "SHORT ENTRY";
-                    document.getElementById("live-bias").className = "signal-type-short";
-                    document.getElementById("live-entry").innerText = "$62.50";
-                    document.getElementById("live-tp").innerText = "$58.20";
-                    document.getElementById("live-sl").innerText = "$65.90";
-                } else {
-                    document.getElementById("live-bias").innerText = "QUANT DETECTED";
-                    document.getElementById("live-bias").className = "signal-type-long";
-                    document.getElementById("live-entry").innerText = "Analyzing Depth...";
-                    document.getElementById("live-tp").innerText = "Auto-Targeting...";
-                    document.getElementById("live-sl").innerText = "Optimizing Risk...";
-                }
+        // دالة فتح وإغلاق القائمة الفخمة بدون لوحة مفاتيح
+        function toggleDropdown() {
+            var options = document.getElementById("dropdown-options");
+            options.style.display = (options.style.display === "block") ? "none" : "block";
+        }
+
+        // هندسة التحديث المتزامن الفوري والمضمون 100%
+        function selectPair(tvSymbol, dispName, recommendation, entry, tp, sl) {
+            initChart(tvSymbol); // تحديث الشارت فوراً بالحجم المستقر
+            
+            // تحديث الجدول بالكامل بلحظتها
+            document.getElementById("live-pair").innerText = dispName;
+            document.getElementById("live-bias").innerText = recommendation;
+            document.getElementById("live-entry").innerText = entry;
+            document.getElementById("live-tp").innerText = tp;
+            document.getElementById("live-sl").innerText = sl;
+            
+            if (recommendation.includes("LONG")) {
+                document.getElementById("live-bias").className = "signal-type-long";
+            } else {
+                document.getElementById("live-bias").className = "signal-type-short";
             }
-        }, 1500); // تحديث فوري كل ثانية ونصف
+            
+            toggleDropdown(); // إغلاق القائمة
+            document.getElementById("select-trigger").querySelector("span").innerText = "📊 Active: " + dispName;
+        }
+
+        // إغلاق القائمة في حال الضغط في أي مكان خارجها
+        window.onclick = function(event) {
+            if (!event.target.matches('.custom-select-trigger') && !event.target.matches('.custom-select-trigger span')) {
+                document.getElementById("dropdown-options").style.style.display = "none";
+            }
+        }
     </script>
 
 </body>
