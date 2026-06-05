@@ -3,195 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlphaSignals.ai | Institution-Grade Trading Intelligence</title>
+    <title>AlphaSignals.ai | Professional Trading Intelligence Terminal</title>
     <style>
         :root {
-            --bg-color: #090d16;
-            --container-bg: #111726;
+            --bg-color: #060913;
+            --container-bg: #0d1222;
             --accent-color: #00e676; 
             --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --border-color: #1f293d;
+            --text-muted: #64748b;
+            --border-color: #1e293b;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 40px 20px;
-            text-align: center;
+            padding: 20px;
         }
-        .container {
+        .header-section {
+            text-align: center;
             max-width: 700px;
-            margin: 0 auto;
+            margin: 0 auto 30px auto;
             background: var(--container-bg);
-            padding: 40px 30px;
-            border-radius: 16px;
+            padding: 25px;
+            border-radius: 12px;
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .badge {
             background: rgba(0, 230, 118, 0.1);
             color: var(--accent-color);
-            padding: 6px 14px;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             display: inline-block;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
+            margin-bottom: 12px;
         }
-        h1 {
-            font-size: 2.2rem;
-            line-height: 1.3;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
+        h1 { font-size: 1.8rem; margin-bottom: 10px; }
         h1 span { color: var(--accent-color); }
-        p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            margin-bottom: 35px;
-            line-height: 1.6;
-        }
+        p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 15px; }
         form {
-            background: #090d16;
-            padding: 8px;
+            background: #060913;
+            padding: 6px;
             border-radius: 30px;
             border: 1px solid var(--border-color);
             display: flex;
             width: 100%;
-            margin-bottom: 25px;
         }
         input[type="email"] {
             flex: 2;
             background: transparent;
             border: none;
-            padding: 12px 20px;
+            padding: 10px 15px;
             color: white;
-            font-size: 1rem;
+            font-size: 0.9rem;
             outline: none;
         }
-        .submit-btn {
+        button {
             flex: 1;
             background: var(--accent-color);
-            color: #090d16;
+            color: #060913;
             border: none;
-            padding: 14px 24px;
-            font-size: 1rem;
+            padding: 10px 20px;
+            font-size: 0.9rem;
             font-weight: 700;
             border-radius: 25px;
             cursor: pointer;
-            transition: all 0.3s ease;
         }
-        .submit-btn:hover {
-            box-shadow: 0 0 15px rgba(0, 230, 118, 0.4);
+        /* Trading Terminal Styling */
+        .terminal-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--container-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
         }
-        .code-section {
-            margin-top: 40px;
-            text-align: left;
-            border-top: 1px solid var(--border-color);
-            padding-top: 30px;
-        }
-        .code-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        .code-title {
+        .terminal-title {
             font-size: 1.1rem;
-            color: var(--text-main);
             font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .copy-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: var(--accent-color);
-            padding: 6px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
-            transition: all 0.2s;
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ff3d00;
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
         }
-        .copy-btn:hover {
-            background: var(--accent-color);
-            color: #090d16;
-        }
-        .code-box {
-            background: #090d16;
-            padding: 20px;
+        #tradingview_widget {
+            height: 550px;
+            width: 100%;
             border-radius: 8px;
-            border: 1px solid var(--border-color);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem;
-            color: #79c0ff;
-            overflow-x: auto;
-            white-space: pre;
-            max-height: 250px;
+            overflow: hidden;
+        }
+        @keyframes blink {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+        @media (max-width: 768px) {
+            #tradingview_widget { height: 400px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="badge">EUROPEAN PRIVATE ALPHA</div>
-        <h1>Outperform the Markets with <span>AI-Driven</span> Data</h1>
-        <p>Get institution-grade quantitative signals, sentiment metrics, and custom TradingView indicators. 100% Free for early adopters.</p>
+    <div class="header-section">
+        <div class="badge">PRO QUANT TERMINAL v2.0</div>
+        <h1>AlphaSignals <span>Intelligence</span> Hub</h1>
+        <p>Real-time machine-learning technical analysis, automated target hunting, and predictive indicators.</p>
         
+        <!-- نظام التقاط الإيميلات الجاهز -->
         <form action="https://formspree.io/f/xpqewykp" method="POST">
-            <input type="email" name="email" placeholder="Enter your European trading email..." required>
-            <button type="submit" class="submit-btn">Join Waitlist</button>
+            <input type="email" name="email" placeholder="Enter your business email for premium signals..." required>
+            <button type="submit">Unlock Full Engine</button>
         </form>
-
-        <div class="code-section">
-            <div class="code-header">
-                <div class="code-title">🛠️ Free Gift: Pine Script v5 Indicator</div>
-                <button class="copy-btn" onclick="copyCode()">Copy Code</button>
-            </div>
-            <p style="font-size: 0.95rem; margin-bottom: 15px; color: var(--text-muted);">Open TradingView -> Pine Editor -> Paste and Add to Chart.</p>
-            <div class="code-box" id="pineCode">//@version=5
-indicator("AlphaSignals AI - Smart Momentum Scalper", overlay=true)
-
-// Inputs for RSI & MACD
-rsiLength = input.int(14, title="RSI Length")
-rsiSource = input.source(close, title="RSI Source")
-fastLength = input.int(12, title="MACD Fast Length")
-slowLength = input.int(26, title="MACD Slow Length")
-signalLength = input.int(9, title="MACD Signal Length")
-
-// Calculate Metrics
-rsiVal = ta.rsi(rsiSource, rsiLength)
-[macdLine, signalLine, _] = ta.macd(close, fastLength, slowLength, signalLength)
-
-// Trading Logic Conditions
-buyCondition = (rsiVal < 35 and ta.crossover(macdLine, signalLine))
-sellCondition = (rsiVal > 65 and ta.crossunder(macdLine, signalLine))
-
-// Plot Signals on the Chart
-plotshape(buyCondition, title="Buy Signal", style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small, text="ALPHA BUY")
-plotshape(sellCondition, title="Sell Signal", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small, text="ALPHA SELL")</div>
-        </div>
     </div>
 
-    <script>
-        function copyCode() {
-            const codeText = document.getElementById("pineCode").innerText;
-            navigator.clipboard.writeText(codeText).then(() => {
-                const btn = document.querySelector(".copy-btn");
-                btn.innerText = "Copied! 🎉";
-                btn.style.background = "#00e676";
-                btn.style.color = "#090d16";
-                setTimeout(() => {
-                    btn.innerText = "Copy Code";
-                    btn.style.background = "rgba(255, 255, 255, 0.05)";
-                    btn.style.color = "#00e676";
-                }, 2000);
-            }).catch(err => {
-                alert("Failed to copy code. Please select and copy manually.");
-            });
-        }
+    <!-- شاشة الـ TradingView الذكية داخل موقعك -->
+    <div class="terminal-container">
+        <div class="terminal-title">
+            <div class="live-dot"></div>
+            <span>AlphaSignals Pro Live Institutional Terminal</span>
+        </div>
+        
+        <!-- محرك الخرائط المتقدم من TradingView -->
+        <div id="tradingview_widget"></div>
+    </div>
+
+    <!-- تحميل مكتبة الـ Widget الرسمية -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script type="text/javascript">
+        new TradingView.widget({
+            "width": "100%",
+            "height": "100%",
+            "symbol": "BINANCE:BTCUSDT",
+            "interval": "15",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_side_toolbar": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_widget",
+            "studies": [
+                "RSI@tv-basicstudies",
+                "MACD@tv-basicstudies"
+            ]
+        });
     </script>
 
 </body>
