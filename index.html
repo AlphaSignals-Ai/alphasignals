@@ -4,19 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AlphaSignals.ai | Pro Terminal</title>
-    
     <link rel="stylesheet" href="style.css">
-    
     <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
     <nav class="navbar">
         <div class="logo">AlphaSignals<span>.ai</span></div>
         <div class="nav-links">
-            <a href="#">Home</a>
-            <a href="#">Terminal</a>
-            <a href="#">Signals</a>
-            <a href="#">Pricing</a>
+            <a href="#" onclick="handleNav('home')">Home</a>
+            <a href="#" onclick="handleNav('terminal')">Terminal</a>
+            <a href="#" onclick="handleNav('signals')">Signals</a>
+            <a href="#" onclick="handleNav('pricing')">Pricing</a>
         </div>
     </nav>
 
@@ -24,7 +22,7 @@
         <div class="ticker-track">BTC +2.4% • ETH +1.8% • SOL +4.1% • WLD -0.5% • HYPE +7.3% • ADA +1.2% • XRP -0.8%</div>
     </div>
 
-    <section class="hero">
+    <section class="hero" id="home-section">
         <div class="badge">PRO QUANT TERMINAL</div>
         <h1>Professional Crypto Intelligence Platform</h1>
         <p>Advanced market analytics, TradingView integration and AI-powered signal workflows.</p>
@@ -35,10 +33,12 @@
             <div class="card"><h2>500+</h2><span>Assets</span></div>
         </div>
 
-        <div class="search-container">
-            <input id="search" placeholder="Search BTC, ETH, SOL, WLD, HYPE..." onkeyup="filterTokens()" autocomplete="off">
-            <div id="dropdown" class="dropdown">
-                </div>
+        <div class="search-trigger-container" id="terminal-section">
+            <button class="search-trigger-btn" onclick="openSearchModal()">
+                <span class="search-icon">🔍</span>
+                <span id="current-search-display">Search markets (e.g. BTC, ETH, Perps)...</span>
+                <span class="shortcut-key">/</span>
+            </button>
         </div>
 
         <div id="tv-home-chart" class="chart"></div>
@@ -68,6 +68,25 @@
             </div>
         </div>
     </section>
+
+    <div id="search-modal" class="modal-overlay" onclick="closeSearchModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <input type="text" id="modal-search-input" placeholder="Search tokens..." onkeyup="renderTokens()">
+                <button class="close-btn" onclick="closeSearchModal(event)">✕</button>
+            </div>
+            
+            <div class="modal-tabs">
+                <button class="tab-btn active" onclick="setTab('all', this)">All</button>
+                <button class="tab-btn" onclick="setTab('perps', this)">Perps</button>
+                <button class="tab-btn" onclick="setTab('spot', this)">Spot</button>
+                <button class="tab-btn" onclick="setTab('stocks', this)">Stocks</button>
+            </div>
+
+            <div class="modal-list" id="modal-token-list">
+                </div>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
