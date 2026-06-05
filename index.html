@@ -3,91 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlphaSignals.ai | Ultimate Exchange Terminal</title>
+    <title>AlphaSignals.ai | DEX Terminal</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
+    <!-- الشريط العلوي النحيف والنظيف -->
     <nav class="navbar">
-        <div class="logo">AlphaSignals<span>.ai</span></div>
+        <div class="logo">AlphaSignals</div>
         <div class="nav-links">
-            <a href="#" onclick="handleNav('home')">Home</a>
-            <a href="#" onclick="handleNav('terminal')">Terminal</a>
-            <a href="#" onclick="handleNav('signals')">Signals</a>
-            <a href="#" onclick="handleNav('pricing')">Pricing</a>
+            <a href="#" class="active">Trade</a>
+            <a href="#">Portfolio</a>
+            <a href="#">Vaults</a>
+            <a href="#">More</a>
         </div>
     </nav>
 
-    <div class="ticker-bar">
-        <div class="ticker-track" id="live-ticker-track">Connecting to Live Exchange Feeds...</div>
+    <!-- الواجهة الرئيسية المقسمة (DEX Layout) -->
+    <div class="terminal-layout">
+        
+        <!-- القسم الأيسر: الشارت والبحث -->
+        <div class="main-pane">
+            <!-- شريط البحث العلوي (مثل Hyperliquid) -->
+            <div class="market-header" onclick="openSearchModal()">
+                <div class="market-info">
+                    <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" id="market-icon" class="market-icon" alt="icon" onerror="this.style.display='none'">
+                    <h1 id="market-title">BTC-USDT</h1>
+                    <span class="leverage-badge" id="market-leverage">40x</span>
+                </div>
+                <div class="market-stats">
+                    <div class="stat-box">
+                        <span class="stat-label">Price</span>
+                        <span class="stat-value" id="market-price">Loading...</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">24h Change</span>
+                        <span class="stat-value" id="market-change">--</span>
+                    </div>
+                    <div class="search-icon-btn">🔍 Search</div>
+                </div>
+            </div>
+
+            <!-- حاضنة الشارت النظيفة -->
+            <div class="chart-container">
+                <div id="tv-chart" class="tv-widget"></div>
+                
+                <!-- الأهداف المدمجة بداخل الشارت (الخدعة الاحترافية والنظيفة) -->
+                <div class="in-chart-ai-overlay" id="in-chart-ai">
+                    <span class="ai-badge">AI TARGETS</span>
+                    <span>Entry: <b id="chart-entry">--</b></span> | 
+                    <span class="text-green">TP: <b id="chart-tp">--</b></span> | 
+                    <span class="text-red">SL: <b id="chart-sl">--</b></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- القسم الأيمن: لوحة أوامر التداول المريحة (Order Panel) -->
+        <div class="order-pane">
+            <div class="order-tabs">
+                <button class="order-tab active long" onclick="setBias('long')">Long</button>
+                <button class="order-tab short" onclick="setBias('short')">Short</button>
+            </div>
+
+            <div class="order-type-tabs">
+                <span class="active">Limit</span>
+                <span>Market</span>
+                <span>Stop</span>
+            </div>
+
+            <div class="order-form">
+                <div class="input-group">
+                    <label>Price (USDT)</label>
+                    <input type="text" id="order-price" value="0.00" readonly>
+                </div>
+                <div class="input-group">
+                    <label>Size</label>
+                    <input type="text" placeholder="0.00">
+                </div>
+
+                <div class="tpsl-section">
+                    <div class="tpsl-header">
+                        <span>Take Profit / Stop Loss</span>
+                        <input type="checkbox" checked disabled>
+                    </div>
+                    <div class="input-group">
+                        <label class="text-green">Take Profit</label>
+                        <input type="text" id="order-tp" class="text-green" value="0.00" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label class="text-red">Stop Loss</label>
+                        <input type="text" id="order-sl" class="text-red" value="0.00" readonly>
+                    </div>
+                </div>
+
+                <button class="place-order-btn" id="place-order-btn">Place Limit Order</button>
+            </div>
+        </div>
     </div>
 
-    <section class="hero" id="home-section">
-        <div class="search-trigger-container" id="terminal-section">
-            <button class="search-trigger-btn" onclick="openSearchModal()">
-                <div class="search-btn-left">
-                    <span class="search-icon">🔍</span>
-                    <span id="current-search-display">BTC / USDT</span>
-                </div>
-                <div class="search-btn-right">
-                    <span class="pulse-dot" id="live-dot" style="display:none;"></span>
-                    <span class="shortcut-key">Select Market</span>
-                </div>
-            </button>
-        </div>
-
-        <div class="chart-wrapper">
-            <div id="tv-home-chart" class="chart"></div>
-            
-            <div id="ai-scanner" class="scanner-line" style="display:none;"></div>
-            <div id="ai-scanning-text" class="scanning-text" style="display:none;">AI Scanning Orderbook...</div>
-
-            <div id="prediction-path" class="prediction-box" style="display:none;">
-                <svg viewBox="0 0 100 100" class="pred-svg">
-                    <path id="svg-proj-line" d="M0,50 Q50,50 100,10" fill="none" stroke="#00e676" stroke-width="3" stroke-dasharray="8,8" class="moving-path"/>
-                </svg>
-            </div>
-        </div>
-
-        <div class="sleek-order-bar" id="sleek-order-bar" style="display:none;">
-            <div class="slim-bias-badge" id="slim-bias">LONG</div>
-            
-            <div class="slim-details-group">
-                <div class="slim-detail">
-                    <span>Entry Target</span>
-                    <strong id="slim-entry">$0.00</strong>
-                </div>
-                <div class="slim-separator"></div>
-                <div class="slim-detail">
-                    <span>Take Profit</span>
-                    <strong id="slim-tp" class="text-green">$0.00</strong>
-                </div>
-                <div class="slim-separator"></div>
-                <div class="slim-detail">
-                    <span>Stop Loss</span>
-                    <strong id="slim-sl" class="text-red">$0.00</strong>
-                </div>
-            </div>
-
-            <button class="slim-execute-btn" id="slim-exec-btn">Execute Trade</button>
-        </div>
-    </section>
-
+    <!-- نافذة البحث العالمية (Hyperliquid Clone تماماً كالصورة 45) -->
     <div id="search-modal" class="modal-overlay" onclick="closeSearchModal(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <input type="text" id="modal-search-input" placeholder="Search 300+ live markets..." onkeyup="renderTokens()">
+            <div class="modal-search-bar">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="modal-search-input" placeholder="Search markets..." onkeyup="renderTokens()">
                 <button class="close-btn" onclick="closeSearchModal(event)">✕</button>
             </div>
             
+            <div class="modal-tabs">
+                <button class="tab-btn active" onclick="setTab('all', this)">All</button>
+                <button class="tab-btn" onclick="setTab('perps', this)">Perps</button>
+                <button class="tab-btn" onclick="setTab('spot', this)">Spot</button>
+            </div>
+
             <div class="modal-list-header">
-                <div style="flex: 2;">Market</div>
-                <div style="flex: 1; text-align: right;">Price</div>
-                <div style="flex: 1; text-align: right;">24h Change</div>
+                <div style="flex: 2;">Symbol</div>
+                <div style="flex: 1; text-align: right;">Volume</div>
+                <div style="flex: 1; text-align: right;">Last Price<br><span style="font-size:0.7rem; font-weight:normal;">24h Change</span></div>
             </div>
 
             <div class="modal-list" id="modal-token-list">
-                <div class="loader-text">Fetching Live Markets Data...</div>
+                <div class="loader-text">Loading Live Markets...</div>
             </div>
         </div>
     </div>
