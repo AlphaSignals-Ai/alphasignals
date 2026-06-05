@@ -1,0 +1,22 @@
+
+:root{
+--bg:#0b1020;--card:#131a2d;--accent:#00e676;--text:#fff;
+}
+body{margin:0;font-family:Segoe UI;background:var(--bg);color:var(--text)}
+.navbar{position:sticky;top:0;display:flex;justify-content:space-between;padding:16px 30px;
+background:rgba(19,26,45,.8);backdrop-filter:blur(15px)}
+.logo span{color:var(--accent)}
+.nav-links a{color:white;text-decoration:none;margin-left:20px}
+.ticker-bar{overflow:hidden;background:#111827;padding:10px 0}
+.ticker-track{white-space:nowrap;animation:scroll 18s linear infinite}
+@keyframes scroll{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+.hero{text-align:center;padding:60px 20px}
+.badge{display:inline-block;padding:8px 14px;border-radius:20px;background:rgba(0,230,118,.15);color:var(--accent)}
+.stats{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin:30px 0}
+.card{background:var(--card);padding:20px;border-radius:14px;min-width:160px}
+.search-container{max-width:600px;margin:20px auto;position:relative}
+.search-container input{width:100%;padding:14px;border-radius:10px;border:1px solid #333;background:#131722;color:white}
+.dropdown{display:none;position:absolute;width:100%;background:#131722;border:1px solid #2A2E39;border-radius:10px;margin-top:5px}
+.item{padding:12px;text-align:left}
+.item:hover{background:#1E222D}
+.chart{height:500px;max-width:1100px;margin:30px auto}

@@ -1,438 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AlphaSignals.ai | Professional Quantum Terminal</title>
-    <style>
-        :root {
-            --bg-color: #060913;
-            --container-bg: #0d1222;
-            --accent-color: #00e676; 
-            --text-main: #ffffff;
-            --text-muted: #64748b;
-            --border-color: #1e293b;
-            --nav-height: 65px;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body {
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-
-        /* 1. تصميم الشريط العلوي الثابت الفخم */
-        .top-navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: var(--nav-height);
-            background: var(--container-bg);
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 30px;
-            z-index: 100;
-        }
-        .nav-logo { font-size: 1.25rem; font-weight: 700; cursor: pointer; }
-        .nav-logo span { color: var(--accent-color); }
-        .nav-links { display: flex; gap: 15px; }
-        .nav-item {
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--text-muted);
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .nav-item:hover, .nav-item.active {
-            color: var(--text-main);
-            border-color: var(--border-color);
-            background: #060913;
-        }
-        .nav-item.active { border-color: var(--accent-color); color: var(--accent-color); }
-
-        .content-wrapper {
-            margin-top: var(--nav-height);
-            width: 100%;
-            min-height: calc(100% - var(--nav-height));
-            padding: 15px;
-        }
-
-        /* صفحة الهبوط الرئيسية */
-        .landing-page {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: calc(100vh - var(--nav-height));
-            text-align: center;
-        }
-        .badge {
-            background: rgba(0, 230, 118, 0.1);
-            color: var(--accent-color);
-            padding: 5px 14px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-        h1 { font-size: 2.3rem; margin-bottom: 15px; font-weight: 700; }
-        h1 span { color: var(--accent-color); }
-        p { color: var(--text-muted); font-size: 1rem; max-width: 580px; margin-bottom: 25px; line-height: 1.6; }
-        
-        form {
-            background: var(--container-bg);
-            padding: 6px;
-            border-radius: 30px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            width: 100%;
-            max-width: 480px;
-            margin-bottom: 15px;
-        }
-        input[type="email"] {
-            flex: 2;
-            background: transparent;
-            border: none;
-            padding: 10px 15px;
-            color: white;
-            font-size: 0.9rem;
-            outline: none;
-        }
-        .btn-submit {
-            background: var(--accent-color);
-            color: #060913;
-            border: none;
-            padding: 10px 22px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            border-radius: 25px;
-            cursor: pointer;
-        }
-
-        /* حاوية الشارت الاحترافي المطور */
-        .terminal-container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 10px auto;
-            display: none; 
-        }
-        
-        /* شريط البحث المنسدل الفخم المتزامن */
-        .advanced-search-block {
-            background: var(--container-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .search-row { display: flex; gap: 10px; }
-        .advanced-search-block input {
-            flex: 1;
-            background: #060913;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 12px;
-            color: white;
-            font-size: 0.95rem;
-            font-weight: 600;
-            outline: none;
-        }
-        .advanced-search-block button {
-            background: var(--accent-color);
-            color: #060913;
-            border: none;
-            padding: 10px 25px;
-            font-weight: 700;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        
-        /* القائمة المنسدلة الذكية المقترحة للعملات */
-        .autocomplete-box {
-            background: #060913;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            max-height: 180px;
-            overflow-y: auto;
-            display: none;
-        }
-        .suggestion-item {
-            padding: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            border-bottom: 1px solid rgba(30, 41, 59, 0.3);
-        }
-        .suggestion-item:hover {
-            background: var(--container-bg);
-            color: var(--accent-color);
-        }
-
-        /* أبعاد الشارت الثابتة والمحمية من الانضغاط */
-        .widget-wrapper {
-            width: 100%;
-            height: 480px; 
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
-        }
-
-        /* لوحة التحكم السفلية الرقمية للمؤشر المطور */
-        .ai-execution-box {
-            background: var(--container-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-        }
-        .ai-box-title {
-            color: var(--accent-color);
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .live-pulse { width: 8px; height: 8px; background-color: var(--accent-color); border-radius: 50%; animation: pulse 1.5s infinite; }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-        .metric-card { background: #060913; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center; }
-        .metric-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
-        .metric-value { font-size: 1.2rem; font-weight: 700; }
-        .val-long { color: #00e676; }
-        .val-short { color: #ff3d00; }
-
-        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
-
-        @media (max-width: 768px) {
-            .top-navbar { padding: 0 15px; }
-            .nav-logo { font-size: 1.1rem; }
-            .nav-item { padding: 6px 10px; font-size: 0.8rem; }
-            h1 { font-size: 1.6rem; }
-            form { flex-direction: column; border-radius: 12px; padding: 10px; }
-            input[type="email"] { background: #060913; border-radius: 8px; margin-bottom: 8px; padding: 12px; }
-            .btn-submit { border-radius: 8px; padding: 12px; }
-            .widget-wrapper { height: 400px; }
-            .metrics-grid { grid-template-columns: 1fr 1fr; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlphaSignals.ai</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
+<nav class="navbar">
+<div class="logo">AlphaSignals<span>.ai</span></div>
+<div class="nav-links">
+<a href="#">Home</a>
+<a href="#">Terminal</a>
+<a href="#">Signals</a>
+<a href="#">Pricing</a>
+</div>
+</nav>
 
-    <div class="top-navbar">
-        <div class="nav-logo" onclick="showScreen('home', this)">AlphaSignals<span>.ai</span></div>
-        <div class="nav-links">
-            <button class="nav-item active" onclick="showScreen('home', this)">Home</button>
-            <button class="nav-item" onclick="showScreen('terminal', this)">Pro Terminal</button>
-            <button class="nav-item" onclick="alert('AI Signals Hub parameters synchronized.')">AI Signals</button>
-            <button class="nav-item" onclick="alert('Pricing models loaded.')">Pricing</button>
-        </div>
-    </div>
+<div class="ticker-bar"><div class="ticker-track">BTC +2.4% • ETH +1.8% • SOL +4.1% • WLD -0.5% • HYPE +7.3%</div></div>
 
-    <div class="content-wrapper">
-        
-        <div class="landing-page" id="screen-home">
-            <div class="badge">PRO QUANT INTERACTIVE TERMINAL v15.0</div>
-            <h1>Automated <span>Market</span> Hub</h1>
-            <p>Access high-fidelity data feeds, embedded algorithmic targets, and strict automated predictive risk layers.</p>
-            
-            <form action="https://formspree.io/f/xpqewykp" method="POST">
-                <input type="email" name="email" placeholder="Enter email to synchronize indicator keys..." required>
-                <button type="submit" class="btn-submit">Authorize</button>
-            </form>
-        </div>
+<section class="hero">
+<div class="badge">PRO QUANT TERMINAL</div>
+<h1>Professional Crypto Intelligence Platform</h1>
+<p>Advanced market analytics, TradingView integration and AI-powered signal workflows.</p>
 
-        <div class="terminal-container" id="screen-terminal">
-            
-            <div class="advanced-search-block">
-                <div class="search-row">
-                    <input type="text" id="asset-search" placeholder="Type to search ticker (e.g., BTC, WLD, HYPE, SOL)..." onkeyup="filterTokens()" autocomplete="off">
-                    <button onclick="triggerAnalysisFromInput()">Analyze</button>
-                </div>
-                <div class="autocomplete-box" id="suggestions-box">
-                    <div class="suggestion-item" onclick="selectToken('BTC', 63120)">🪙 BTC (Bitcoin)</div>
-                    <div class="suggestion-item" onclick="selectToken('WLD', 0.4920)">🧬 WLD (Worldcoin)</div>
-                    <div class="suggestion-item" onclick="selectToken('HYPE', 62.50)">🔥 HYPE (Hyperliquid)</div>
-                    <div class="suggestion-item" onclick="selectToken('SOL', 165.40)">☀️ SOL (Solana)</div>
-                    <div class="suggestion-item" onclick="selectToken('ETH', 3450.00)">💎 ETH (Ethereum)</div>
-                </div>
-            </div>
+<div class="stats">
+<div class="card"><h2>92.7%</h2><span>Accuracy</span></div>
+<div class="card"><h2>1.2M+</h2><span>Signals</span></div>
+<div class="card"><h2>500+</h2><span>Assets</span></div>
+</div>
 
-            <div class="widget-wrapper">
-                <div id="alphasignals_tv_widget" style="width: 100%; height: 100%;"></div>
-            </div>
+<div class="search-container">
+<input id="search" placeholder="Search BTC, ETH, SOL..." onkeyup="filterTokens()">
+<div id="dropdown" class="dropdown">
+<div class="item">BTCUSDT — Bitcoin</div>
+<div class="item">ETHUSDT — Ethereum</div>
+<div class="item">SOLUSDT — Solana</div>
+<div class="item">WLDUSDT — Worldcoin</div>
+</div>
+</div>
 
-            <div class="ai-execution-box">
-                <div class="ai-box-title">
-                    <div class="live-pulse"></div>
-                    <span id="ai-title-pair">AlphaSignals AI Engine: Processing BTC / USDT Setup...</span>
-                </div>
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-label">Market Bias</div>
-                        <div class="metric-value val-long" id="metric-bias">LONG ENTRY</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">Mathematical Entry</div>
-                        <div class="metric-value" id="metric-entry">$63,120</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">Take Profit (🎯 TP)</div>
-                        <div class="metric-value val-long" id="metric-tp">$64,750</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">Stop Loss (🚨 SL)</div>
-                        <div class="metric-value val-short" id="metric-sl">$62,100</div>
-                    </div>
-                </div>
-            </div>
+<div id="tv-home-chart" class="chart"></div>
+</section>
 
-        </div>
-
-    </div>
-
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <script type="text/javascript">
-        var activeSymbol = "BINANCE:BTCUSDT";
-
-        function showScreen(screenType, btnElement) {
-            document.getElementById("screen-home").style.display = "none";
-            document.getElementById("screen-terminal").style.display = "none";
-            
-            var items = document.getElementsByClassName("nav-item");
-            for (var i = 0; i < items.length; i++) { items[i].classList.remove("active"); }
-            btnElement.classList.add("active");
-
-            if (screenType === 'home') {
-                document.getElementById("screen-home").style.display = "flex";
-            } else if (screenType === 'terminal') {
-                document.getElementById("screen-terminal").style.display = "block";
-                loadTradingViewEngine(activeSymbol);
-            }
-        }
-
-        // محرك تحميل شارت TradingView الأصلي الفخم المليء بالبيانات والشموع الحية
-        function loadTradingViewEngine(symbolName) {
-            new TradingView.widget({
-                "autosize": true,
-                "symbol": symbolName,
-                "interval": "15",
-                "timezone": "Etc/UTC",
-                "theme": "dark",
-                "style": "1",
-                "locale": "en",
-                "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false,
-                "withdaterange": true,
-                "hide_side_toolbar": true, 
-                "allow_symbol_change": false, 
-                "details": false,
-                "hotlist": false,
-                "calendar": false,
-                "container_id": "alphasignals_tv_widget",
-                
-                // حقن مؤشرات الدخول والخروج والزخم الذكية الحقيقية داخل الشارت نفسه تلقائياً!
-                "studies": [
-                    "RSI@tv-basicstudies"
-                ]
-            });
-        }
-
-        // وظيفة التصفية الذكية للقائمة المنسدلة المقترحة بمجرد الكتابة
-        function filterTokens() {
-            var input = document.getElementById("asset-search").value.toUpperCase();
-            var box = document.getElementById("suggestions-box");
-            var items = box.getElementsByClassName("suggestion-item");
-            
-            if(input.length > 0) {
-                box.style.display = "block";
-                var matchCount = 0;
-                for (var i = 0; i < items.length; i++) {
-                    if (items[i].innerText.toUpperCase().includes(input)) {
-                        items[i].style.display = "block";
-                        matchCount++;
-                    } else {
-                        items[i].style.display = "none";
-                    }
-                }
-                if(matchCount === 0) { box.style.display = "none"; }
-            } else {
-                box.style.display = "none";
-            }
-        }
-
-        // دالة اختيار العملة من القائمة المنسدلة وتحديث الشارت والجدول معاً في نفس الملي ثانية
-        function selectToken(ticker, estimatedPrice) {
-            document.getElementById("asset-search").value = ticker;
-            document.getElementById("suggestions-box").style.display = "none";
-            
-            // ضبط الرمز للبورصة العالمية
-            var exchangeSymbol = "BINANCE:" + ticker + "USDT";
-            if(ticker === "HYPE") { exchangeSymbol = "BYBIT:HYPEUSDT"; }
-            
-            activeSymbol = exchangeSymbol;
-            
-            // 1. تحديث الشارت الأصلي لـ TradingView ليعرض العملة المليئة بالبيانات الحية فوراً
-            loadTradingViewEngine(activeSymbol);
-            
-            // 2. تحديث لوحة التحكم الرقمية ومستويات المؤشر الفورية بالأسفل تلقائياً
-            calculateIndicatorMetrics(ticker, estimatedPrice);
-        }
-
-        // حساب مستويات الدخول والخروج والـ TP/SL تلقائياً بناءً على العملة المختارة
-        function calculateIndicatorMetrics(ticker, price) {
-            document.getElementById("ai-title-pair").innerText = "AlphaSignals AI Engine: Processing " + ticker + " / USDT Setup...";
-            
-            var bias = Math.random() > 0.45 ? "LONG ENTRY" : "SHORT ENTRY";
-            var entry = price;
-            var tp = bias === "LONG ENTRY" ? entry * 1.035 : entry * 0.965;
-            var sl = bias === "LONG ENTRY" ? entry * 0.982 : entry * 1.018;
-
-            var precision = entry > 100 ? 2 : 4;
-            document.getElementById("metric-bias").innerText = bias;
-            document.getElementById("metric-bias").className = bias.includes("LONG") ? "metric-value val-long" : "metric-value val-short";
-            document.getElementById("metric-entry").innerText = "$" + entry.toFixed(precision);
-            document.getElementById("metric-tp").innerText = "$" + tp.toFixed(precision);
-            document.getElementById("metric-sl").innerText = "$" + sl.toFixed(precision);
-        }
-
-        function triggerAnalysisFromInput() {
-            var val = document.getElementById("asset-search").value.trim().toUpperCase();
-            if(val === "BTC") selectToken('BTC', 63120);
-            else if(val === "WLD") selectToken('WLD', 0.4920);
-            else if(val === "HYPE") selectToken('HYPE', 62.50);
-            else if(val === "SOL") selectToken('SOL', 165.40);
-            else if(val === "ETH") selectToken('ETH', 3450.00);
-            else {
-                // معالجة مرنة لأي اسم عملة عشوائي يكتبه المستخدم لضمان عمل الواجهة
-                activeSymbol = "BINANCE:" + val + "USDT";
-                loadTradingViewEngine(activeSymbol);
-                document.getElementById("ai-title-pair").innerText = "AlphaSignals AI Engine: Processing " + val + " / USDT Setup...";
-                document.getElementById("metric-bias").innerText = "SCANNING";
-                document.getElementById("metric-bias").className = "metric-value";
-                document.getElementById("metric-entry").innerText = "Live Pricing...";
-                document.getElementById("metric-tp").innerText = "Calculating...";
-                document.getElementById("metric-sl").innerText = "Optimizing...";
-            }
-        }
-    </script>
-
+<script src="assets/js/app.js"></script>
 </body>
 </html>
