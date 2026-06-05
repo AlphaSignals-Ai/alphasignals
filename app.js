@@ -30,10 +30,11 @@ async function fetchBinanceMarkets() {
 
     } catch (error) {
         console.error("API Fetch Error:", error);
-        document.getElementById('modal-token-list').innerHTML = '<div class="loader-text text-red">Connection failed. Retrying...</div>';
+        document.getElementById('modal-token-list').innerHTML = '<div class="loader-text" style="color: #ff3d00;">Connection failed. Retrying...</div>';
     }
 }
 
+// تحديث شريط الأخبار المتحرك بالأعلى
 function updateTickerBar() {
     const top20 = tokens.slice(0, 20);
     const tickerText = top20.map(t => {
@@ -43,6 +44,7 @@ function updateTickerBar() {
     document.getElementById('live-ticker-track').innerText = tickerText;
 }
 
+// التنقل بين الروابط
 function handleNav(section) {
     if(section === 'home') window.scrollTo({top: 0, behavior: 'smooth'});
     else if(section === 'terminal') document.getElementById('terminal-section').scrollIntoView({behavior: 'smooth', block: 'start'});
@@ -102,7 +104,7 @@ function loadChart(symbolConfig) {
         enable_publishing: false,
         hide_side_toolbar: false,
         allow_symbol_change: false,
-        // إزالة RSI تماماً كما طلبت
+        // إزالة RSI كما طلبت
         studies: [] 
     });
 }
@@ -125,7 +127,7 @@ function simulateAnalysis(token, isInitialLoad) {
         scanningText.style.display = 'block';
     }
 
-    // محاكاة وقت التحليل الفني
+    // محاكاة وقت التحليل الفني (1.8 ثانية)
     setTimeout(() => {
         scanner.style.display = 'none';
         scanningText.style.display = 'none';
@@ -152,7 +154,7 @@ function simulateAnalysis(token, isInitialLoad) {
         document.getElementById('slim-sl').innerText = `$${sl.toFixed(precision)}`;
         document.getElementById('slim-sl').className = isLong ? "text-red" : "text-green";
 
-        // رسم مسار التوقع المستقبلي المضيء على الحافة (الخدعة البصرية)
+        // رسم مسار التوقع المستقبلي المضيء على الحافة (الخدعة البصرية للشموع الوهمية)
         const svgPath = document.getElementById('svg-proj-line');
         if (isLong) {
             svgPath.setAttribute('d', 'M0,50 Q40,50 100,10'); // مسار صاعد
@@ -166,7 +168,7 @@ function simulateAnalysis(token, isInitialLoad) {
         predictionPath.style.display = 'flex';
         liveDot.style.display = 'inline-block';
 
-    }, isInitialLoad ? 0 : 1800); // 1.8 ثانية للمسح الضوئي
+    }, isInitialLoad ? 0 : 1800); 
 }
 
 function selectToken(token, isInitialLoad) {
@@ -178,6 +180,7 @@ function selectToken(token, isInitialLoad) {
     simulateAnalysis(token, isInitialLoad);
 }
 
+// التشغيل الافتراضي عند فتح الموقع
 window.onload = function() {
     fetchBinanceMarkets();
 };
