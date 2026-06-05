@@ -96,7 +96,7 @@
             animation: blink 1.5s infinite;
         }
         #tradingview_widget {
-            height: 550px;
+            height: 500px;
             width: 100%;
             border-radius: 8px;
             overflow: hidden;
@@ -106,15 +106,14 @@
             50% { opacity: 1; }
             100% { opacity: 0.2; }
         }
-        /* تعديل الأبعاد الذكي للهواتف المحمولة لمنع الضغط والتشويه */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .header-section { padding: 15px; }
-            h1 { font-size: 1.5rem; }
+            h1 { font-size: 1.4rem; }
             form { flex-direction: column; border-radius: 12px; padding: 10px; gap: 10px; }
-            input[type="email"] { background: #0d1222; border-radius: 8px; padding: 12px; }
+            input[type="email"] { background: #060913; border-radius: 8px; padding: 12px; }
             button { border-radius: 8px; padding: 12px; }
-            #tradingview_widget { height: 350px; }
+            #tradingview_widget { height: 380px; }
         }
     </style>
 </head>
@@ -125,25 +124,21 @@
         <h1>AlphaSignals <span>Intelligence</span> Hub</h1>
         <p>Real-time machine-learning technical analysis, automated target hunting, and predictive indicators.</p>
         
-        <!-- نظام التقاط الإيميلات الجاهز -->
-        <form action="YOUR_FORMSPREE_URL_HERE" method="POST">
+        <form action="https://formspree.io/f/xpqewykp" method="POST">
             <input type="email" name="email" placeholder="Enter your business email for premium signals..." required>
             <button type="submit">Unlock Full Engine</button>
         </form>
     </div>
 
-    <!-- شاشة الـ TradingView الذكية داخل موقعك -->
     <div class="terminal-container">
         <div class="terminal-title">
             <div class="live-dot"></div>
             <span>AlphaSignals Pro Live Institutional Terminal</span>
         </div>
         
-        <!-- محرك الخرائط المتقدم من TradingView -->
         <div id="tradingview_widget"></div>
     </div>
 
-    <!-- تحميل مكتبة الـ Widget الرسمية -->
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="text/javascript">
         new TradingView.widget({
@@ -157,12 +152,11 @@
             "locale": "en",
             "toolbar_bg": "#f1f3f6",
             "enable_publishing": false,
-            "hide_side_toolbar": false,
+            "hide_side_toolbar": true, // تم إخفاء الشريط الجانبي المعقد لتوسيع المساحة على الموبايل
             "allow_symbol_change": true,
             "container_id": "tradingview_widget",
             "studies": [
-                "RSI@tv-basicstudies",
-                "MACD@tv-basicstudies"
+                "RSI@tv-basicstudies"
             ]
         });
     </script>
