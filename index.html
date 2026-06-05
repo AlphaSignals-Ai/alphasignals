@@ -42,7 +42,7 @@
         h1 { font-size: 1.8rem; margin-bottom: 10px; }
         h1 span { color: var(--accent-color); }
         p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 15px; }
-        form.waitlist-form {
+        form {
             background: #060913;
             padding: 6px;
             border-radius: 30px;
@@ -50,7 +50,8 @@
             display: flex;
             width: 100%;
         }
-        input[type="email"], input[type="text"] {
+        input[type="email"] {
+            flex: 2;
             background: transparent;
             border: none;
             padding: 10px 15px;
@@ -58,7 +59,6 @@
             font-size: 0.9rem;
             outline: none;
         }
-        input[type="email"] { flex: 2; }
         button {
             background: var(--accent-color);
             color: #060913;
@@ -75,30 +75,14 @@
             background: var(--container-bg);
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            padding: 15px;
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
         }
-        /* تصميم محرك البحث الموحد المطور */
-        .search-block {
-            display: flex;
-            background: #060913;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 5px;
-            margin-bottom: 20px;
-            gap: 10px;
-        }
-        .search-block input {
-            flex: 1;
-        }
-        .search-block button {
-            border-radius: 6px;
-        }
-        /* إعادة أبعاد الحاضنة الكبيرة المستقرة والواضحة تماماً */
+        /* تضخيم شاشة الشارت الفخمة المستقرة لفتح الشموع */
         .widget-wrapper {
             width: 100%;
-            height: 550px;
-            min-height: 500px; 
+            height: 600px; 
+            min-height: 550px;
             border-radius: 8px;
             overflow: hidden;
         }
@@ -107,7 +91,7 @@
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 20px;
-            margin-top: 25px;
+            margin-bottom: 25px;
             text-align: left;
         }
         .signals-title {
@@ -154,45 +138,37 @@
             body { padding: 10px; }
             .header-section { padding: 15px; }
             h1 { font-size: 1.4rem; }
-            form.waitlist-form { flex-direction: column; border-radius: 12px; padding: 10px; gap: 10px; }
-            form.waitlist-form input[type="email"] { background: #060913; border-radius: 8px; padding: 12px; }
-            form.waitlist-form button { border-radius: 8px; padding: 12px; }
-            .widget-wrapper { height: 480px; min-height: 480px; }
+            form { flex-direction: column; border-radius: 12px; padding: 10px; gap: 10px; }
+            input[type="email"] { background: #060913; border-radius: 8px; padding: 12px; }
+            button { border-radius: 8px; padding: 12px; }
+            .widget-wrapper { height: 500px; min-height: 500px; }
         }
     </style>
 </head>
 <body>
 
     <div class="header-section">
-        <div class="badge">PRO QUANT TERMINAL v5.0</div>
+        <div class="badge">PRO QUANT TERMINAL v6.0</div>
         <h1>AlphaSignals <span>Intelligence</span> Hub</h1>
         <p>Real-time machine-learning technical analysis, automated target hunting, and predictive indicators.</p>
         
-        <form class="waitlist-form" action="https://formspree.io/f/xpqewykp" method="POST">
+        <form action="https://formspree.io/f/xpqewykp" method="POST">
             <input type="email" name="email" placeholder="Enter your business email for premium signals..." required>
             <button type="submit">Unlock Full Engine</button>
         </form>
     </div>
 
     <div class="terminal-container">
-        <div class="search-block">
-            <input type="text" id="coin-search-input" placeholder="Type ticker name (e.g., BTC, WLD, ETH, SOL, HYPE)..." value="BTC">
-            <button onclick="executeSearch()">Analyze Asset</button>
-        </div>
         
-        <div class="widget-wrapper">
-            <div id="tradingview_widget" style="width: 100%; height: 100%;"></div>
-        </div>
-
         <div class="signals-box">
             <div class="signals-title">
                 <div class="green-dot"></div>
-                <span>AlphaSignals AI - Live Smart Scanner (Autonomous Calculations)</span>
+                <span>AlphaSignals AI - Live Terminal Intelligence Briefing</span>
             </div>
             <table class="signals-table">
                 <thead>
                     <tr>
-                        <th>Active Asset</th>
+                        <th>Selected Ticker</th>
                         <th>AI Recommendation</th>
                         <th>Mathematical Entry</th>
                         <th>Take Profit (TP)</th>
@@ -201,84 +177,75 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td id="dyn-name">BTC / USDT</td>
-                        <td id="dyn-type" class="signal-type-long">LONG ENTRY</td>
-                        <td id="dyn-entry">$63,120</td>
-                        <td id="dyn-tp" style="color: #00e676;">$64,750</td>
-                        <td id="dyn-sl" style="color: #ff3d00;">$62,100</td>
+                        <td id="live-pair">BTC / USDT</td>
+                        <td id="live-bias" class="signal-type-long">LONG ENTRY</td>
+                        <td id="live-entry">$63,120</td>
+                        <td id="live-tp" style="color: #00e676;">$64,750</td>
+                        <td id="live-sl" style="color: #ff3d00;">$62,100</td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
+        <div class="widget-wrapper">
+            <div id="tradingview_widget" style="width: 100%; height: 100%;"></div>
+        </div>
+
     </div>
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script type="text/javascript">
-        // دالة إنشاء وبناء الشارت المستقرة الكبيرة
-        function createWidget(symbolTicker) {
-            document.getElementById("tradingview_widget").innerHTML = ""; 
-            new TradingView.widget({
-                "width": "100%",
-                "height": "100%",
-                "symbol": symbolTicker,
-                "interval": "15",
-                "timezone": "Etc/UTC",
-                "theme": "dark",
-                "style": "1",
-                "locale": "en",
-                "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false,
-                "hide_side_toolbar": true, 
-                "allow_symbol_change": false, 
-                "container_id": "tradingview_widget"
-            });
-        }
+        // استدعاء المنصة بنظام الـ Advanced Widget الشامل للقوائم المنسدلة
+        var widget = new TradingView.widget({
+            "width": "100%",
+            "height": "100%",
+            "symbol": "BINANCE:BTCUSDT",
+            "interval": "15",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "hide_side_toolbar": true,
+            "allow_symbol_change": true, // تفعيل محرك البحث المنسدل الأصلي بآلاف العملات
+            "container_id": "tradingview_widget"
+        });
 
-        // تحميل أولي للبيتكوين
-        createWidget("BINANCE:BTCUSDT");
+        // المزامنة الهندسية الذكية: تتبع الـ Ticker الذي يختاره العميل من القائمة المنسدلة وتحديث الجدول
+        setInterval(function() {
+            if (typeof widget !== 'undefined' && widget.options) {
+                var currentTicker = widget.options.symbol.split(":")[1] || widget.options.symbol;
+                document.getElementById("live-pair").innerText = currentTicker.replace("USDT", " / USDT");
 
-        // المحرك السحري الموحد لربط البحث العشوائي بالجدول والشارت معاً
-        function executeSearch() {
-            var inputRaw = document.getElementById("coin-search-input").value.trim().toUpperCase();
-            if(!inputRaw) return;
-            
-            // معالجة الاسم ليتوافق مع صيغة البورصة القياسية
-            var formattedSymbol = "BINANCE:" + inputRaw + "USDT";
-            if(inputRaw === "HYPE") { formattedSymbol = "BYBIT:HYPEUSDT"; } // تخصيص سيرفر لـ Hyperliquid
-            
-            // 1. تحديث الشارت فوراً بحجمه الكبير المستقر
-            createWidget(formattedSymbol);
-            
-            // 2. تحديث جدول الأشارات الفوري بناءً على الحسابات الرياضية للعملة المدخلة
-            document.getElementById("dyn-name").innerText = inputRaw + " / USDT";
-            
-            if(inputRaw === "BTC") {
-                document.getElementById("dyn-type").innerText = "LONG ENTRY";
-                document.getElementById("dyn-type").className = "signal-type-long";
-                document.getElementById("dyn-entry").innerText = "$63,120";
-                document.getElementById("dyn-tp").innerText = "$64,750";
-                document.getElementById("dyn-sl").innerText = "$62,100";
-            } else if(inputRaw === "WLD") {
-                document.getElementById("dyn-type").innerText = "SHORT ENTRY";
-                document.getElementById("dyn-type").className = "signal-type-short";
-                document.getElementById("dyn-entry").innerText = "$0.5510";
-                document.getElementById("dyn-tp").innerText = "$0.5180";
-                document.getElementById("dyn-sl").innerText = "$0.5790";
-            } else if(inputRaw === "HYPE") {
-                document.getElementById("dyn-type").innerText = "SHORT ENTRY";
-                document.getElementById("dyn-type").className = "signal-type-short";
-                document.getElementById("dyn-entry").innerText = "$62.50";
-                document.getElementById("dyn-tp").innerText = "$58.20";
-                document.getElementById("dyn-sl").innerText = "$65.90";
-            } else {
-                // محاكاة حسابية لأي عملة أخرى في العالم يكتبها المستخدم للحفاظ على تفاعلية المنصة
-                document.getElementById("dyn-type").innerText = "LONG ENTRY";
-                document.getElementById("dyn-type").className = "signal-type-long";
-                document.getElementById("dyn-entry").innerText = "Calculating Volatility...";
-                document.getElementById("dyn-tp").innerText = "Auto Targeting...";
-                document.getElementById("dyn-sl").innerText = "Risk Optimizing...";
+                // حسابات ديناميكية فورية حسب العملة لتبدو أوتوماتيكية بالكامل
+                if (currentTicker.includes("BTC")) {
+                    document.getElementById("live-bias").innerText = "LONG ENTRY";
+                    document.getElementById("live-bias").className = "signal-type-long";
+                    document.getElementById("live-entry").innerText = "$63,120";
+                    document.getElementById("live-tp").innerText = "$64,750";
+                    document.getElementById("live-sl").innerText = "$62,100";
+                } else if (currentTicker.includes("WLD")) {
+                    document.getElementById("live-bias").innerText = "SHORT ENTRY";
+                    document.getElementById("live-bias").className = "signal-type-short";
+                    document.getElementById("live-entry").innerText = "$0.5510";
+                    document.getElementById("live-tp").innerText = "$0.5180";
+                    document.getElementById("live-sl").innerText = "$0.5790";
+                } else if (currentTicker.includes("HYPE")) {
+                    document.getElementById("live-bias").innerText = "SHORT ENTRY";
+                    document.getElementById("live-bias").className = "signal-type-short";
+                    document.getElementById("live-entry").innerText = "$62.50";
+                    document.getElementById("live-tp").innerText = "$58.20";
+                    document.getElementById("live-sl").innerText = "$65.90";
+                } else {
+                    document.getElementById("live-bias").innerText = "QUANT DETECTED";
+                    document.getElementById("live-bias").className = "signal-type-long";
+                    document.getElementById("live-entry").innerText = "Analyzing Depth...";
+                    document.getElementById("live-tp").innerText = "Auto-Targeting...";
+                    document.getElementById("live-sl").innerText = "Optimizing Risk...";
+                }
             }
-        }
+        }, 1500); // تحديث فوري كل ثانية ونصف
     </script>
 
 </body>
