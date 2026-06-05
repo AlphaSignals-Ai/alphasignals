@@ -1,22 +1,39 @@
-
-:root{
---bg:#0b1020;--card:#131a2d;--accent:#00e676;--text:#fff;
+:root {
+    --bg: #0b1020; --card: #131a2d; --accent: #00e676; --text: #fff;
 }
-body{margin:0;font-family:Segoe UI;background:var(--bg);color:var(--text)}
-.navbar{position:sticky;top:0;display:flex;justify-content:space-between;padding:16px 30px;
-background:rgba(19,26,45,.8);backdrop-filter:blur(15px)}
-.logo span{color:var(--accent)}
-.nav-links a{color:white;text-decoration:none;margin-left:20px}
-.ticker-bar{overflow:hidden;background:#111827;padding:10px 0}
-.ticker-track{white-space:nowrap;animation:scroll 18s linear infinite}
-@keyframes scroll{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
-.hero{text-align:center;padding:60px 20px}
-.badge{display:inline-block;padding:8px 14px;border-radius:20px;background:rgba(0,230,118,.15);color:var(--accent)}
-.stats{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin:30px 0}
-.card{background:var(--card);padding:20px;border-radius:14px;min-width:160px}
-.search-container{max-width:600px;margin:20px auto;position:relative}
-.search-container input{width:100%;padding:14px;border-radius:10px;border:1px solid #333;background:#131722;color:white}
-.dropdown{display:none;position:absolute;width:100%;background:#131722;border:1px solid #2A2E39;border-radius:10px;margin-top:5px}
-.item{padding:12px;text-align:left}
-.item:hover{background:#1E222D}
-.chart{height:500px;max-width:1100px;margin:30px auto}
+body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); }
+.navbar { position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center; padding: 16px 30px; background: rgba(19,26,45,.8); backdrop-filter: blur(15px); z-index: 100; border-bottom: 1px solid #1E222D; }
+.logo { font-size: 1.4rem; font-weight: bold; }
+.logo span { color: var(--accent); }
+.nav-links a { color: white; text-decoration: none; margin-left: 20px; font-weight: 500; font-size: 0.95rem; transition: color 0.3s; }
+.nav-links a:hover { color: var(--accent); }
+.ticker-bar { overflow: hidden; background: #111827; padding: 10px 0; font-size: 0.9rem; font-weight: bold; color: var(--accent); border-bottom: 1px solid #1E222D; }
+.ticker-track { white-space: nowrap; animation: scroll 20s linear infinite; }
+@keyframes scroll { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+.hero { text-align: center; padding: 50px 20px; }
+.badge { display: inline-block; padding: 6px 16px; border-radius: 20px; background: rgba(0, 230, 118, 0.1); color: var(--accent); font-weight: bold; font-size: 0.85rem; margin-bottom: 15px; letter-spacing: 1px; }
+h1 { margin-bottom: 10px; font-size: 2.2rem; }
+p { color: var(--text-muted); color: #8b9bb4; max-width: 600px; margin: 0 auto 30px auto; line-height: 1.6; }
+.stats { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 40px 0; }
+.card { background: var(--card); padding: 20px; border-radius: 14px; min-width: 160px; border: 1px solid #1E222D; }
+.card h2 { margin: 0 0 5px 0; font-size: 1.8rem; color: var(--text); }
+.card span { color: #8b9bb4; font-size: 0.9rem; text-transform: uppercase; font-weight: bold; }
+.search-container { max-width: 600px; margin: 0 auto 30px auto; position: relative; }
+.search-container input { width: 100%; padding: 16px 20px; border-radius: 12px; border: 1px solid #2A2E39; background: #131722; color: white; font-size: 1rem; outline: none; transition: border 0.3s; }
+.search-container input:focus { border-color: var(--accent); }
+.dropdown { display: none; position: absolute; width: 100%; background: #131722; border: 1px solid #2A2E39; border-radius: 12px; margin-top: 8px; z-index: 50; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.item { padding: 15px 20px; text-align: left; cursor: pointer; font-weight: 600; border-bottom: 1px solid #1E222D; transition: background 0.2s; }
+.item:hover { background: #1E222D; color: var(--accent); }
+.chart { height: 500px; max-width: 1100px; margin: 0 auto 20px auto; border-radius: 14px; overflow: hidden; border: 1px solid #1E222D; }
+
+/* تصميم صندوق الذكاء الاصطناعي الجديد */
+.ai-signals-container { max-width: 1100px; margin: 0 auto 50px auto; background: var(--card); border: 1px solid #2A2E39; border-radius: 14px; padding: 25px; text-align: left; }
+.ai-header { display: flex; align-items: center; gap: 10px; color: var(--text); font-weight: bold; margin-bottom: 20px; font-size: 1.1rem; }
+.pulse-dot { width: 10px; height: 10px; background: var(--accent); border-radius: 50%; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0, 230, 118, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); } }
+.ai-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+.ai-card { background: #0b1020; padding: 15px; border-radius: 10px; border: 1px solid #1E222D; text-align: center; }
+.ai-label { color: #8b9bb4; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 8px; font-weight: bold; }
+.ai-value { font-size: 1.4rem; font-weight: bold; color: var(--text); }
+.ai-green { color: #00e676; }
+.ai-red { color: #ff3d00; }
