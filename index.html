@@ -3,88 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlphaSignals | On-Chain Terminal</title>
+    <title>AlphaSignals | Pro Terminal</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
-    <!-- الشريط العلوي -->
-    <nav class="navbar">
+    <nav class="navbar" id="top-nav">
         <div class="logo">AlphaSignals<span>.Terminal</span></div>
         <div class="nav-links">
-            <a href="#" class="active">Dashboard</a>
-            <a href="#onchain-sniper">On-Chain Sniper</a>
+            <button class="nav-btn active" onclick="switchView('terminal-view')">📈 Terminal</button>
+            <button class="nav-btn" onclick="switchView('markets-view')">🌐 Live Markets</button>
+            <button class="nav-btn" onclick="switchView('sniper-view')">🎯 Wallet Sniper</button>
         </div>
     </nav>
 
-    <div class="terminal-layout">
-        <!-- العمود الأوسط (الشارت ولوحة القيادة) -->
-        <div class="main-workspace">
-            <!-- الشارت النقي مع شريط البحث الأصلي -->
-            <div class="chart-container" id="tv_chart_container"></div>
-
-            <!-- اللوحة السفلية (الرادار والسيولة) -->
-            <div class="bottom-dashboard">
-                <div class="dash-panel">
-                    <div class="panel-title">🔥 Top Gainers (24h)</div>
-                    <div id="top-gainers" class="list-container loader-text">Loading...</div>
-                </div>
-                <div class="dash-panel">
-                    <div class="panel-title">🩸 Top Losers (24h)</div>
-                    <div id="top-losers" class="list-container loader-text">Loading...</div>
-                </div>
-                <div class="dash-panel">
-                    <div class="panel-title">⭐️ My Watchlist</div>
-                    <div id="watchlist" class="list-container loader-text">Loading...</div>
-                </div>
-                <div class="dash-panel macro-panel">
-                    <div class="panel-title">🌍 Macro Indicators</div>
-                    <div class="macro-item"><span>Fear & Greed:</span> <strong class="text-green">72 (Greed)</strong></div>
-                    <div class="macro-item"><span>BTC Dominance:</span> <strong>54.2%</strong></div>
-                    <div class="macro-item"><span>24h Vol (Binance):</span> <strong>$14.2B</strong></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- العمود الأيمن (الاستخبارات) -->
-        <div class="right-sidebar">
-            <!-- صائد المحافظ (Wallet Sniper) -->
-            <div class="sidebar-panel sniper-panel" id="onchain-sniper">
-                <div class="panel-title">🎯 On-Chain Wallet Sniper</div>
-                <p class="sniper-desc">Track wallets or upload DEX PNL images to reverse-engineer the wallet address.</p>
-                <input type="text" id="wallet-input" placeholder="Enter Wallet (0x...)">
-                
-                <div class="upload-container">
-                    <label for="image-upload" class="upload-btn">📸 Upload PNL Image</label>
-                    <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleImageUpload()">
-                </div>
-                
-                <div id="sniper-result" class="sniper-result" style="display: none;">
-                    <!-- نتائج الفحص ستظهر هنا -->
-                </div>
-            </div>
-
-            <!-- الأخبار الحية -->
-            <div class="sidebar-panel">
-                <div class="panel-title">📰 Live News Feed</div>
-                <div class="news-feed" id="news-feed">
-                    <!-- سيتم توليد الأخبار بواسطة الجافاسكريبت -->
-                </div>
-            </div>
-
-            <!-- رادار الحيتان -->
-            <div class="sidebar-panel">
-                <div class="panel-title">🐋 Whale Alerts</div>
-                <div class="whale-feed" id="whale-feed">
-                    <!-- سيتم توليد حركات الحيتان هنا -->
-                </div>
-            </div>
+    <div class="breaking-ticker">
+        <div class="breaking-track">
+            <span>🔴 <strong>BREAKING:</strong> Bitcoin ETF inflows reach record $1.2B this week.</span>
+            <span>🟢 <strong>ON-CHAIN:</strong> Hyperliquid HYPE token crosses $60 mark.</span>
+            <span>⚪ <strong>MARKET:</strong> Federal Reserve announces no change in interest rates.</span>
+            <span>🔴 <strong>ALERT:</strong> $500M USDT minted at Tether Treasury.</span>
         </div>
     </div>
 
-    <!-- توقيعك -->
-    <div class="footer-credit">
-        Engineered by <strong>Mohaned Alarbe</strong> &copy; 2024
+    <div class="main-container">
+        
+        <div id="terminal-view" class="view-section active-view">
+            <div class="terminal-grid">
+                <div class="chart-wrapper">
+                    <div id="tv_chart_container"></div>
+                </div>
+                
+                <div class="intel-wrapper">
+                    <div class="intel-panel">
+                        <div class="panel-header">📰 Live News Feed</div>
+                        <div class="intel-content" id="live-news-feed">
+                            </div>
+                    </div>
+                    <div class="intel-panel">
+                        <div class="panel-header">🐋 Whale Alerts</div>
+                        <div class="intel-content" id="live-whale-feed">
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="markets-view" class="view-section">
+            <div class="markets-container">
+                <div class="markets-header">
+                    <h2>Live Markets Explorer</h2>
+                    <input type="text" id="market-search" placeholder="Search tokens..." onkeyup="renderMarketsTable()">
+                </div>
+                
+                <div class="markets-tabs">
+                    <button class="tab-btn active" onclick="filterMarkets('all', this)">All Markets</button>
+                    <button class="tab-btn" onclick="filterMarkets('perps', this)">Perpetuals (Perps)</button>
+                    <button class="tab-btn" onclick="filterMarkets('spot', this)">Spot</button>
+                    <button class="tab-btn" onclick="filterMarkets('stocks', this)">Stocks</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="markets-table">
+                        <thead>
+                            <tr>
+                                <th>Asset</th>
+                                <th>Type</th>
+                                <th style="text-align: right;">Price</th>
+                                <th style="text-align: right;">24h Change</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="markets-tbody">
+                            <tr><td colspan="5" class="loader-text">Syncing live data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="sniper-view" class="view-section">
+            <div class="sniper-container">
+                <div class="sniper-header">
+                    <h2>🎯 On-Chain Wallet Sniper</h2>
+                    <p>Advanced tool to track blockchain wallets or reverse-engineer DEX PNL images.</p>
+                </div>
+                
+                <div class="sniper-card">
+                    <label>Manual Wallet Tracking</label>
+                    <div class="input-group">
+                        <input type="text" id="wallet-input" placeholder="Enter Wallet Address (e.g., 0x...)">
+                        <button class="action-btn">Track Wallet</button>
+                    </div>
+                </div>
+
+                <div class="sniper-divider">OR</div>
+
+                <div class="sniper-card">
+                    <label>Reverse-Engineer via Trade Image (Hyperliquid/DEX)</label>
+                    <div class="upload-area" onclick="document.getElementById('image-upload').click()">
+                        <span id="upload-text">📸 Click to Upload PNL Image</span>
+                        <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleSniperUpload()">
+                    </div>
+                </div>
+
+                <div id="sniper-result" class="sniper-result-box" style="display: none;">
+                    </div>
+            </div>
+        </div>
+
     </div>
 
     <script src="app.js"></script>
