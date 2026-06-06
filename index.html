@@ -3,68 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlphaSignals | Pro Terminal</title>
+    <title>AlphaSignals | Overlay Terminal</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
-    <nav class="navbar" id="top-nav">
-        <div class="logo">AlphaSignals<span>.Terminal</span></div>
+    <!-- خلفية الموقع العميقة -->
+    <div class="ambient-background"></div>
+
+    <!-- الشريط العلوي الزجاجي -->
+    <nav class="hud-navbar" id="top-nav">
+        <div class="logo">AlphaSignals<span class="glow-text">.HUD</span></div>
         <div class="nav-links">
-            <button class="nav-btn active" onclick="switchView('terminal-view')">📈 Terminal</button>
-            <button class="nav-btn" onclick="switchView('markets-view')">🌐 Live Markets</button>
-            <button class="nav-btn" onclick="switchView('sniper-view')">🎯 Wallet Sniper</button>
+            <button class="hud-btn active" onclick="switchView('terminal-view')">📈 Terminal</button>
+            <button class="hud-btn" onclick="switchView('markets-view')">🌐 Live Markets</button>
+            <button class="hud-btn" onclick="switchView('sniper-view')">🎯 Wallet Sniper</button>
         </div>
     </nav>
 
-    <div class="breaking-ticker">
-        <div class="breaking-track">
-            <span>🔴 <strong>BREAKING:</strong> Bitcoin ETF inflows reach record $1.2B this week.</span>
-            <span>🟢 <strong>ON-CHAIN:</strong> Hyperliquid HYPE token crosses $60 mark.</span>
-            <span>⚪ <strong>MARKET:</strong> Federal Reserve announces no change in interest rates.</span>
-            <span>🔴 <strong>ALERT:</strong> $500M USDT minted at Tether Treasury.</span>
+    <!-- شريط الأخبار الطافي -->
+    <div class="floating-ticker">
+        <div class="ticker-track">
+            <span>🔴 BREAKING: Bitcoin ETF inflows reach record $1.2B this week.</span>
+            <span>🟢 ON-CHAIN: Hyperliquid HYPE token crosses $60 mark.</span>
+            <span>⚪ MARKET: Federal Reserve announces no change in interest rates.</span>
+            <span>🔴 ALERT: $500M USDT minted at Tether Treasury.</span>
         </div>
     </div>
 
-    <div class="main-container">
+    <div class="hud-container">
         
+        <!-- النافذة الأولى: Terminal (بدون حواف) -->
         <div id="terminal-view" class="view-section active-view">
-            <div class="terminal-grid">
-                <div class="chart-wrapper">
+            <div class="terminal-overlay-layout">
+                <!-- الشارت المدمج -->
+                <div class="chart-glass-wrapper">
                     <div id="tv_chart_container"></div>
                 </div>
                 
-                <div class="intel-wrapper">
-                    <div class="intel-panel">
-                        <div class="panel-header">📰 Live News Feed</div>
-                        <div class="intel-content" id="live-news-feed">
-                            </div>
+                <!-- اللوحات الزجاجية الجانبية -->
+                <div class="intel-glass-sidebar">
+                    <div class="glass-panel">
+                        <div class="panel-title-glow">Live News Feed</div>
+                        <div class="feed-content" id="live-news-feed">
+                            <div class="loader-pulse">Loading intel...</div>
+                        </div>
                     </div>
-                    <div class="intel-panel">
-                        <div class="panel-header">🐋 Whale Alerts</div>
-                        <div class="intel-content" id="live-whale-feed">
-                            </div>
+                    <div class="glass-panel">
+                        <div class="panel-title-glow">Whale Alerts</div>
+                        <div class="feed-content" id="live-whale-feed">
+                            <div class="loader-pulse">Scanning blockchain...</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- النافذة الثانية: Markets (Overlay Table) -->
         <div id="markets-view" class="view-section">
-            <div class="markets-container">
+            <div class="glass-panel markets-glass">
                 <div class="markets-header">
-                    <h2>Live Markets Explorer</h2>
-                    <input type="text" id="market-search" placeholder="Search tokens..." onkeyup="renderMarketsTable()">
+                    <h2 class="glow-text">Markets Explorer</h2>
+                    <input type="text" id="market-search" class="glass-input" placeholder="Search tokens..." onkeyup="renderMarketsTable()">
                 </div>
                 
                 <div class="markets-tabs">
-                    <button class="tab-btn active" onclick="filterMarkets('all', this)">All Markets</button>
-                    <button class="tab-btn" onclick="filterMarkets('perps', this)">Perpetuals (Perps)</button>
-                    <button class="tab-btn" onclick="filterMarkets('spot', this)">Spot</button>
-                    <button class="tab-btn" onclick="filterMarkets('stocks', this)">Stocks</button>
+                    <button class="glass-tab active" onclick="filterMarkets('all', this)">All Markets</button>
+                    <button class="glass-tab" onclick="filterMarkets('perps', this)">Perps</button>
+                    <button class="glass-tab" onclick="filterMarkets('spot', this)">Spot</button>
                 </div>
 
                 <div class="table-responsive">
-                    <table class="markets-table">
+                    <table class="glass-table">
                         <thead>
                             <tr>
                                 <th>Asset</th>
@@ -75,40 +85,47 @@
                             </tr>
                         </thead>
                         <tbody id="markets-tbody">
-                            <tr><td colspan="5" class="loader-text">Syncing live data...</td></tr>
+                            <tr><td colspan="5" class="loader-pulse" style="text-align:center;">Syncing data stream...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
+        <!-- النافذة الثالثة: Sniper (تصميم استخباراتي متطور) -->
         <div id="sniper-view" class="view-section">
-            <div class="sniper-container">
+            <div class="sniper-hud-container">
                 <div class="sniper-header">
-                    <h2>🎯 On-Chain Wallet Sniper</h2>
-                    <p>Advanced tool to track blockchain wallets or reverse-engineer DEX PNL images.</p>
+                    <h2 class="glow-text">On-Chain Sniper</h2>
+                    <p>Reverse-engineer trades & track entities.</p>
                 </div>
                 
-                <div class="sniper-card">
-                    <label>Manual Wallet Tracking</label>
-                    <div class="input-group">
-                        <input type="text" id="wallet-input" placeholder="Enter Wallet Address (e.g., 0x...)">
-                        <button class="action-btn">Track Wallet</button>
+                <div class="sniper-glass-grid">
+                    <div class="glass-panel sniper-module">
+                        <div class="panel-title-glow">Direct Trace</div>
+                        <div class="input-glow-group">
+                            <input type="text" id="wallet-input" class="glass-input" placeholder="Enter Wallet (0x...)">
+                            <button class="glass-action-btn">Trace</button>
+                        </div>
+                    </div>
+
+                    <div class="sniper-divider">
+                        <div class="line"></div><span>OR</span><div class="line"></div>
+                    </div>
+
+                    <div class="glass-panel sniper-module">
+                        <div class="panel-title-glow">Reverse Engineering</div>
+                        <div class="hologram-upload" onclick="document.getElementById('image-upload').click()">
+                            <div class="hologram-icon">📷</div>
+                            <span id="upload-text">Initialize PNL Image Scan</span>
+                            <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleSniperUpload()">
+                        </div>
                     </div>
                 </div>
 
-                <div class="sniper-divider">OR</div>
-
-                <div class="sniper-card">
-                    <label>Reverse-Engineer via Trade Image (Hyperliquid/DEX)</label>
-                    <div class="upload-area" onclick="document.getElementById('image-upload').click()">
-                        <span id="upload-text">📸 Click to Upload PNL Image</span>
-                        <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleSniperUpload()">
-                    </div>
+                <div id="sniper-result" class="glass-panel result-hologram" style="display: none;">
+                    <!-- النتيجة -->
                 </div>
-
-                <div id="sniper-result" class="sniper-result-box" style="display: none;">
-                    </div>
             </div>
         </div>
 
