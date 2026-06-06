@@ -22,35 +22,42 @@
     <div class="floating-ticker">
         <div class="ticker-track">
             <span>🔴 BREAKING: Market volatility spikes across major L1 networks.</span>
-            <span>🟢 ON-CHAIN: Hyperliquid volume surpasses Binance in selected pairs.</span>
-            <span>⚪ MARKET: Federal Reserve holds rates steady.</span>
+            <span>🟢 ON-CHAIN: Hyperliquid volume active.</span>
+            <span>⚪ MARKET: Monitoring live data feeds.</span>
             <span>🔴 ALERT: Massive stablecoin movement detected.</span>
         </div>
     </div>
 
     <div class="hud-container">
-        <!-- Terminal View -->
         <div id="terminal-view" class="view-section active-view">
             <div class="terminal-overlay-layout">
                 <div class="chart-glass-wrapper">
                     <div id="tv_chart_container"></div>
                 </div>
+                
                 <div class="intel-glass-sidebar">
-                    <div class="glass-panel">
-                        <div class="panel-title-glow">Live News Feed</div>
-                        <div class="feed-content" id="live-news-feed"></div>
+                    <div class="glass-panel" style="display: flex; flex-direction: column;">
+                        <div class="panel-title-glow" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span>Live Crypto News</span>
+                            <button class="hud-btn" style="padding: 4px 8px; font-size: 0.7rem;" onclick="fetchRealNews()">🔄 Refresh</button>
+                        </div>
+                        <div class="feed-content" id="live-news-feed">
+                            <div class="loader-pulse">Connecting to Live News API...</div>
+                        </div>
                     </div>
-                    <div class="glass-panel">
-                        <div class="panel-title-glow">Whale Alerts</div>
-                        <div class="feed-content" id="live-whale-feed"></div>
+                    
+                    <div class="glass-panel" style="display: flex; flex-direction: column;">
+                        <div class="panel-title-glow">Live Whale Alerts</div>
+                        <div class="feed-content" id="live-whale-feed">
+                            <div class="loader-pulse">Scanning blockchain...</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Markets View (Powered by Hyperliquid) -->
         <div id="markets-view" class="view-section">
-            <div class="glass-panel markets-glass">
+            <div class="glass-panel markets-glass centered-markets">
                 <div class="markets-header">
                     <h2 class="glow-text">Hyperliquid L1 Markets</h2>
                     <input type="text" id="market-search" class="glass-input" placeholder="Search tokens..." onkeyup="renderMarketsTable()">
@@ -77,7 +84,6 @@
             </div>
         </div>
 
-        <!-- Sniper & Tracker View -->
         <div id="sniper-view" class="view-section">
             <div class="sniper-hud-container">
                 <div class="sniper-header">
