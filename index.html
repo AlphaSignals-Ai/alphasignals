@@ -3,122 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AlphaSignals | Pro Terminal</title>
+    <title>Hyperliquid Tracker Clone</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://s3.tradingview.com/tv.js"></script>
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 </head>
-<body>
-    <nav class="pro-navbar" id="top-nav">
-        <div class="logo">AlphaSignals<span class="accent-text">.</span></div>
-        <div class="nav-links">
-            <button class="nav-tab active" onclick="switchView('terminal-view')">Terminal</button>
-            <button class="nav-tab" onclick="switchView('markets-view')">Markets</button>
-            <button class="nav-tab" onclick="switchView('sniper-view')">Tracker</button>
-        </div>
-        <!-- مبدل الألوان (Theme Switcher) -->
-        <div class="theme-switcher">
-            <button class="theme-dot theme-green" onclick="setTheme('green')" title="Turquoise"></button>
-            <button class="theme-dot theme-blue" onclick="setTheme('blue')" title="Ice Blue"></button>
-            <button class="theme-dot theme-purple" onclick="setTheme('purple')" title="Purple"></button>
-        </div>
-    </nav>
+<body data-theme="turquoise">
+    <div class="app-wrapper">
+        
+        <header class="app-header" id="main-header">
+            <div class="header-left">
+                <button class="icon-btn" onclick="openSettings()">☰</button>
+            </div>
+            <div class="header-right">
+                <button class="pro-badge">⚡ PRO</button>
+                <button class="icon-btn add-btn" onclick="showAddWalletModal()">+</button>
+            </div>
+        </header>
 
-    <div class="ticker-bar">
-        <div class="ticker-track">
-            <span>🚀 Hyperliquid L1 volume surges past $2B.</span>
-            <span>⚡ Real-time on-chain tracking activated.</span>
-            <span>📊 Live market feeds operating at 1ms latency.</span>
-        </div>
-    </div>
+        <main id="view-wallets" class="view active-view">
+            <div id="empty-wallets-state" class="empty-state">
+                <div class="empty-icon">
+                    <img src="https://cdn-icons-png.flaticon.com/512/855/855279.png" alt="Wallet" style="width: 50px; opacity: 0.5; filter: invert(1);">
+                </div>
+                <h2>No wallet addresses tracked</h2>
+                <p>Add any Hyperliquid wallet address to track positions and PnL</p>
+                <button class="primary-btn" onclick="showAddWalletModal()">+ Add Wallet Address</button>
+            </div>
+            
+            <div id="tracked-wallets-list" class="wallets-list" style="display: none;">
+                </div>
+        </main>
 
-    <div class="app-container">
-        <!-- Terminal View -->
-        <div id="terminal-view" class="view-section active-view">
-            <div class="terminal-layout">
-                <div class="pro-card chart-container">
-                    <div id="tv_chart_container"></div>
+        <main id="view-leaderboard" class="view">
+            <div class="page-title">
+                <h1>Leaderboard</h1>
+                <p>Top traders on Hyperliquid</p>
+            </div>
+            <div class="filters-row">
+                <button class="filter-pill active">💎 Whales</button>
+                <button class="filter-pill outline">📈 Total PnL</button>
+                <button class="filter-pill outline">↓ DESC</button>
+            </div>
+            <div class="leaderboard-list" id="leaderboard-content">
+                </div>
+        </main>
+
+        <main id="view-tokens" class="view">
+            <div class="page-title">
+                <h1>Tokens</h1>
+                <p>All tokens on Hyperliquid</p>
+            </div>
+            <div class="main-tabs">
+                <button class="main-tab active" onclick="switchTokenTab('all')">All</button>
+                <button class="main-tab" onclick="switchTokenTab('favorites')">Favorites (0)</button>
+            </div>
+            <div class="filters-row scrollable-x">
+                <button class="filter-pill outline">📊 Volume</button>
+                <button class="filter-pill outline">↓ DESC</button>
+                <button class="filter-pill outline">📈 Gainers</button>
+                <button class="filter-pill outline">📉 Losers</button>
+            </div>
+            <div class="tokens-list" id="tokens-content">
+                <div class="loader">Fetching live Hyperliquid data...</div>
+            </div>
+        </main>
+
+        <div id="settings-overlay" class="overlay-page">
+            <header class="modal-header">
+                <div style="width: 24px;"></div>
+                <h2>Settings</h2>
+                <button class="icon-btn close-btn" onclick="closeSettings()">✕</button>
+            </header>
+            <div class="settings-content">
+                <div class="settings-section">
+                    <div class="section-title">APPEARANCE</div>
+                    <div class="settings-card">
+                        <div class="card-row no-border flex-col">
+                            <span>Accent Style</span>
+                            <div class="theme-picker">
+                                <button class="theme-btn active" onclick="setTheme('turquoise', this)">Turquoise</button>
+                                <button class="theme-btn" onclick="setTheme('iceblue', this)">Ice Blue</button>
+                                <button class="theme-btn" onclick="setTheme('lime', this)">Lime</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="trader-detail-view" class="overlay-page">
+            <header class="modal-header">
+                <button class="icon-btn" onclick="closeTraderDetail()">❮</button>
+                <div class="trader-header-info">
+                    <h2 id="td-title">Trader ...</h2>
+                    <p id="td-address">0x...</p>
+                </div>
+                <button class="primary-btn outline-primary small-btn">⊕ Start Tracking</button>
+            </header>
+            <div class="trader-scroll-content">
+                <div class="equity-section">
+                    <span class="muted-text">Total Equity</span>
+                    <h1 id="td-equity">$0.00</h1>
+                    <div class="equity-split">
+                        <div><span class="muted-text">Perps</span><br><span id="td-perps">$0.00</span></div>
+                        <div><span class="muted-text">Spot</span><br><span id="td-spot">$0.00</span></div>
+                    </div>
+                </div>
+
+                <div class="main-tabs" style="margin: 20px 0;">
+                    <button class="main-tab active">Overview</button>
+                    <button class="main-tab">Positions (0)</button>
+                    <button class="main-tab">Orders (0)</button>
+                    <button class="main-tab">History</button>
+                </div>
+
+                <div class="timeframe-tabs">
+                    <button class="timeframe-btn active">1D</button>
+                    <button class="timeframe-btn">7D</button>
+                    <button class="timeframe-btn">30D</button>
+                    <button class="timeframe-btn">1Y</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="muted-text">PNL</span>
+                        <h3 class="txt-red" id="td-pnl">-$0.00</h3>
+                        <span class="muted-text txt-red">-0.00% ROE</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="muted-text">Unrealized PNL</span>
+                        <h3 class="txt-green" id="td-upnl">+$0.00</h3>
+                        <span class="muted-text txt-green">+0.00% ROE</span>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <h3>Account Value History</h3>
+                    <div class="chart-box" id="account-chart"></div>
                 </div>
                 
-                <div class="sidebar-layout">
-                    <div class="pro-card flex-card">
-                        <div class="card-header">
-                            <h3>Live News</h3>
-                            <button class="icon-btn" onclick="fetchRealNews()">🔄</button>
-                        </div>
-                        <div class="feed-content" id="live-news-feed">
-                            <div class="loader-text">Fetching news...</div>
-                        </div>
-                    </div>
-                    
-                    <div class="pro-card flex-card">
-                        <div class="card-header">
-                            <h3>Whale Alerts</h3>
-                        </div>
-                        <div class="feed-content" id="live-whale-feed">
-                            <div class="loader-text">Scanning blockchain...</div>
-                        </div>
-                    </div>
+                <div class="chart-section">
+                    <h3>PnL History</h3>
+                    <div class="chart-box" id="pnl-chart"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Markets View -->
-        <div id="markets-view" class="view-section">
-            <div class="pro-card markets-card">
-                <div class="markets-top">
-                    <h2>Tokens</h2>
-                    <input type="text" id="market-search" class="pro-input" placeholder="Search tokens..." onkeyup="renderMarketsTable()">
-                </div>
-                <div class="pill-tabs">
-                    <button class="pill-btn active" onclick="filterMarkets('all', this)">All</button>
-                    <button class="pill-btn" onclick="filterMarkets('perps', this)">Perps</button>
-                </div>
-                <div class="table-container">
-                    <table class="pro-table">
-                        <thead>
-                            <tr>
-                                <th>Asset</th>
-                                <th style="text-align: right;">Price</th>
-                                <th style="text-align: right;">24h Change</th>
-                                <th style="text-align: right;">Chart</th>
-                            </tr>
-                        </thead>
-                        <tbody id="markets-tbody">
-                            <tr><td colspan="4" class="loader-text" style="text-align:center;">Syncing...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+        <div id="add-wallet-modal" class="modal-bg" onclick="closeAddWalletModal(event)">
+            <div class="modal-box">
+                <h3>Track New Wallet</h3>
+                <input type="text" id="new-wallet-input" placeholder="Enter Hyperliquid Address (0x...)">
+                <button class="primary-btn" style="width: 100%; margin-top: 15px;" onclick="trackNewWallet()">Add Wallet</button>
             </div>
         </div>
 
-        <!-- Wallet Tracker View -->
-        <div id="sniper-view" class="view-section">
-            <div class="tracker-container">
-                <div class="pro-card">
-                    <div class="card-header" style="justify-content: center; border: none; padding-bottom: 0;">
-                        <h2>Track Wallet</h2>
-                    </div>
-                    <p style="text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">
-                        Add any Hyperliquid wallet address to track positions and PnL
-                    </p>
-                    
-                    <div class="input-action-group">
-                        <input type="text" id="wallet-input" class="pro-input" placeholder="0x4ec8fe22...">
-                        <button class="pro-btn" onclick="trackWallet()">+ Track</button>
-                    </div>
-
-                    <div class="divider"><span>OR UPLOAD IMAGE</span></div>
-
-                    <div class="upload-box" onclick="document.getElementById('image-upload').click()">
-                        <div class="upload-icon">📷</div>
-                        <span id="upload-text">Upload DEX PNL Image</span>
-                        <input type="file" id="image-upload" accept="image/*" style="display: none;" onchange="handleSniperUpload()">
-                    </div>
-                </div>
-
-                <div id="sniper-result" class="result-area" style="display: none;"></div>
-            </div>
-        </div>
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="switchNav('wallets', this)">
+                <div class="nav-icon">▤</div>
+                <span>Wallets</span>
+            </button>
+            <button class="nav-item" onclick="switchNav('leaderboard', this)">
+                <div class="nav-icon">📊</div>
+                <span>Leaderboard</span>
+            </button>
+            <button class="nav-item" onclick="switchNav('search', this)">
+                <div class="nav-icon">🔍</div>
+                <span>Search</span>
+            </button>
+            <button class="nav-item" onclick="switchNav('tokens', this)">
+                <div class="nav-icon">🪙</div>
+                <span>Tokens</span>
+            </button>
+        </nav>
     </div>
 
     <script src="app.js"></script>
